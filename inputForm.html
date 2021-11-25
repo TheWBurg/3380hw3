@@ -14,35 +14,203 @@
         }
     </style>
 </head>
+<style>.invisible{display:none;}</style>
 <body>
     <form>
-        <div class="formBox">
-            <label for="ssn">SSN</label>
-            <input type="text" id="ssn" placeholder="SSN"/>
+        <div class="registerUser">
+            <h2>Enter Your Personal Information</h2>
+            <div class="formBox">
+                <label for="ssn">SSN</label>
+                <input type="text" id="ssn" placeholder="SSN"/>
+            </div>
+            <div class="formBox">
+                <label for="firstName">First Name</label>
+                <input type="text" id="firstName" placeholder="First Name"/>
+            </div>
+            <div class="formBox">
+                <label for="lastName">Last Name</label>
+                <input type="text" id="lastName" placeholder="Last Name"/>
+            </div>
+            <div class="formBox">
+                <label for="email">Email</label>
+                <input type="text" id="email" placeholder="Email"/>
+            </div>
+            <div class="formBox">
+                <label for="phoneNum">Phone Number</label>
+                <input type="text" id="phoneNum" placeholder="Phone Number"/>
+            </div>
+            <div class="formBox">
+                <button id="addCustomerBtn">Click to Add</button>
+            </div>
         </div>
-        <div class="formBox">
-            <label for="firstName">First Name</label>
-            <input type="text" id="firstName" placeholder="First Name"/>
+    </form>
+    <form>
+        <div class="searchFlights">
+            <h2>Search for Flights</h2>
+            <div class="formBox">
+                <label for="departureCity">Departure City</label>
+                <input type="text" id="departureCity" placeholder="Departure City"/>
+            </div>
+            <div class="formBox">
+                <label for="arrivalCity">Arrival City</label>
+                <input type="text" id="arrivalCity" placeholder="Arrival City"/>
+            </div>
+            <div class="formBox">
+                <button id="searchFlightBtn">Click to Search</button>
+            </div>
+            <p id="flightFesults"></p>
         </div>
-        <div class="formBox">
-            <label for="lastName">Last Name</label>
-            <input type="text" id="lastName" placeholder="Last Name"/>
+    </form>
+        <div class="buyTicket">
+            <h2>Buy Tickets</h2>
+            <p>Person 1</p>
+            <form class="buyTicketInfo">
+                <div class="formBox">
+                    <label for="ssn">SSN</label>
+                    <input type="text" class="ssn" placeholder="SSN"/>
+                </div>
+                <div class="formBox">
+                    <label for="flight_id">Flight ID Number</label>
+                    <input type="text" class="flight_id" placeholder="Flight ID Number"/>
+                </div>
+                <div class="formBox">
+                    <label for="class">Economy, Business, or First Class?</label>
+                    <input type="text" clas="class" placeholder="Class"/>
+                </div>
+                <div class="formBox">
+                    <label for="creditCardNum">Enter Credit Card Number</label>
+                    <input type="text" class="creditCardNum" placeholder="Card Number"/>
+                </div>
+                <div class="formBox">
+                    <label for="discountCode">Enter a Discount Code (optional)</label>
+                    <input type="text" class="discountCode" placeholder="Discount Code"/>
+                </div>
+                <div class="formBox">
+                    <label for="numBags">How Many Bags?</label>
+                    <input type="text" class="numBags" placeholder="Number of Bags"/>
+                </div>
+            </form>
+            <p>Person 2</p>
+            <form class="buyTicketInfo">
+                <div class="formBox">
+                    <label for="ssn">SSN</label>
+                    <input type="text" class="ssn" placeholder="SSN"/>
+                </div>
+                <div class="formBox">
+                    <label for="flight_id">Flight ID Number</label>
+                    <input type="text" class="flight_id" placeholder="Flight ID Number"/>
+                </div>
+                <div class="formBox">
+                    <label for="classType">Economy, Business, or First Class?</label>
+                    <input type="text" clas="classType" placeholder="Class"/>
+                </div>
+                <div class="formBox">
+                    <label for="creditCardNum">Enter Credit Card Number</label>
+                    <input type="text" class="creditCardNum" placeholder="Card Number"/>
+                </div>
+                <div class="formBox">
+                    <label for="discountCode">Enter a Discount Code (optional)</label>
+                    <input type="text" class="discountCode" placeholder="Discount Code"/>
+                </div>
+                <div class="formBox">
+                    <label for="numBags">How Many Bags?</label>
+                    <input type="text" class="numBags" placeholder="Number of Bags"/>
+                </div>
+            </form>
+            <p>Person 3</p>
+            <form class="buyTicketInfo">
+                <div class="formBox">
+                    <label for="ssn">SSN</label>
+                    <input type="text" class="ssn" placeholder="SSN"/>
+                </div>
+                <div class="formBox">
+                    <label for="flight_id">Flight ID Number</label>
+                    <input type="text" class="flight_id" placeholder="Flight ID Number"/>
+                </div>
+                <div class="formBox">
+                    <label for="class">Economy, Business, or First Class?</label>
+                    <input type="text" clas="class" placeholder="Class"/>
+                </div>
+                <div class="formBox">
+                    <label for="creditCardNum">Enter Credit Card Number</label>
+                    <input type="text" class="creditCardNum" placeholder="Card Number"/>
+                </div>
+                <div class="formBox">
+                    <label for="discountCode">Enter a Discount Code (optional)</label>
+                    <input type="text" class="discountCode" placeholder="Discount Code"/>
+                </div>
+                <div class="formBox">
+                    <label for="numBags">How Many Bags?</label>
+                    <input type="text" class="numBags" placeholder="Number of Bags"/>
+                </div>
+            </form>
+            <p>Person 4</p>
+            <form class="buyTicketInfo">
+                <div class="formBox">
+                    <label for="ssn">SSN</label>
+                    <input type="text" class="ssn" placeholder="SSN"/>
+                </div>
+                <div class="formBox">
+                    <label for="flight_id">Flight ID Number</label>
+                    <input type="text" class="flight_id" placeholder="Flight ID Number"/>
+                </div>
+                <div class="formBox">
+                    <label for="class">Economy, Business, or First Class?</label>
+                    <input type="text" clas="class" placeholder="Class"/>
+                </div>
+                <div class="formBox">
+                    <label for="creditCardNum">Enter Credit Card Number</label>
+                    <input type="text" class="creditCardNum" placeholder="Card Number"/>
+                </div>
+                <div class="formBox">
+                    <label for="discountCode">Enter a Discount Code (optional)</label>
+                    <input type="text" class="discountCode" placeholder="Discount Code"/>
+                </div>
+                <div class="formBox">
+                    <label for="numBags">How Many Bags?</label>
+                    <input type="text" class="numBags" placeholder="Number of Bags"/>
+                </div>
+            </form>
+            <p>Person 5</p>
+            <form class="buyTicketInfo">
+                <div class="formBox">
+                    <label for="ssn">SSN</label>
+                    <input type="text" class="ssn" placeholder="SSN"/>
+                </div>
+                <div class="formBox">
+                    <label for="flight_id">Flight ID Number</label>
+                    <input type="text" class="flight_id" placeholder="Flight ID Number"/>
+                </div>
+                <div class="formBox">
+                    <label for="class">Economy, Business, or First Class?</label>
+                    <input type="text" clas="class" placeholder="Class"/>
+                </div>
+                <div class="formBox">
+                    <label for="creditCardNum">Enter Credit Card Number</label>
+                    <input type="text" class="creditCardNum" placeholder="Card Number"/>
+                </div>
+                <div class="formBox">
+                    <label for="discountCode">Enter a Discount Code (optional)</label>
+                    <input type="text" class="discountCode" placeholder="Discount Code"/>
+                </div>
+                <div class="formBox">
+                    <label for="numBags">How Many Bags?</label>
+                    <input type="text" class="numBags" placeholder="Number of Bags"/>
+                </div>
+            </form>
+            <div class="formBox">
+                <button id="buyTicketBtn">Click to Purchase</button>
+            </div>
         </div>
-        <div class="formBox">
-            <label for="email">Email</label>
-            <input type="text" id="email" placeholder="Email"/>
+        <div class="cancelTicket">
+            <h2>Cancel Tickets</h2>
         </div>
-        <div class="formBox">
-            <label for="phoneNum">Phone Number</label>
-            <input type="text" id="phoneNum" placeholder="Phone Number"/>
-        </div>
-        <div class="formBox">
-            <button id="btn">Click to Add</button>
+        <div class="checkStatus">
+            <h2>Check Status of Your Ticket</h2>
         </div>
         <div id="msg">
             <pre></pre>
         </div>
-    </form>
     <script src="./test/testIndex.js" type="module"></script>
 </body>
 </html>

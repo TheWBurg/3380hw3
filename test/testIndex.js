@@ -1,3 +1,2 @@
-import { exportedCall } from "../frontend/exported.js";
+import "../frontend/exported.js";
 
-exportedCall();

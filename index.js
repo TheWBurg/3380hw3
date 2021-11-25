@@ -56,13 +56,69 @@ app.post('/addCustomer', async function (req, res)
         );
     }
     catch(err) {console.log(err.message);}
+    console.log(q.rows);
+    //var r = JSON.stringify(q.rows)
+
     // send stuff back to frontend
-    res.json({"foo": `bar`});
+    res.json(q.rows);
     //res.sendStatus(200);
     console.log("Added a customer to the database");
     return; 
 });
 
+app.post('/searchFlight', async function (req, res)
+{
+    console.log('Got searchFlight body:', req.body);
+    // c is thisCustomer
+    let f = req.body; 
+
+    try 
+    {
+        var q = await pool.query
+        (
+            `SELECT * FROM flight WHERE 
+            departure_airport_id = (SELECT airport_id FROM airport WHERE airport_city = '${f.departureAirport}')
+            AND 
+            arrival_airport_id = (SELECT airport_id FROM airport WHERE airport_city = '${f.arrivalAirport}');`
+        );
+    }
+    catch(err) {console.log(err.message);}
+    console.log(q.rows);
+    //var r = JSON.stringify(q.rows)
+
+    // send stuff back to frontend
+    res.json(q.rows);
+    //res.sendStatus(200);
+    console.log("Added a customer to the database");
+    return; 
+});
+
+app.post('/buyTicket', async function (req, res)
+{
+    console.log('Got buyTicket body:', req.body);
+    // c is thisCustomer
+    let t = req.body; 
+
+    try 
+    {
+        var q = await pool.query
+        (
+            `SELECT * FROM flight WHERE 
+            departure_airport_id = (SELECT airport_id FROM airport WHERE airport_city = '${f.departureAirport}')
+            AND 
+            arrival_airport_id = (SELECT airport_id FROM airport WHERE airport_city = '${f.arrivalAirport}');`
+        );
+    }
+    catch(err) {console.log(err.message);}
+    console.log(q.rows);
+    //var r = JSON.stringify(q.rows)
+
+    // send stuff back to frontend
+    res.json(q.rows);
+    //res.sendStatus(200);
+    console.log("Added a valid ticket to the database");
+    return; 
+});
 
 //}
 /*

@@ -44,13 +44,48 @@ export async function saveTicketInfo(validTicketInfo)
     // call database function 
     // wait on the results 
 
-    const response = await fetch(`http://localhost:5000/buyTicket`, 
-        {
+    const response = await fetch(`http://localhost:5000/saveTicketInfo`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
               },
             body: JSON.stringify(validTicketInfo)
+        }
+    );
+    let res = await response.json()
+    console.log(res)
+    return res;
+}
+
+export async function getTicketBasePrice(thisValidTicket) {
+    // do validation
+    // call database function 
+    // wait on the results 
+
+    const response = await fetch(`http://localhost:5000/ticketBasePrice`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+              },
+            body: JSON.stringify(thisValidTicket)
+        }
+    );
+    let res = await response.json()
+    console.log(res)
+    return res;
+}
+
+export async function getDiscountInfo(thisDiscountCode) {
+    // do validation
+    // call database function 
+    // wait on the results 
+
+    const response = await fetch(`http://localhost:5000/discountInfo`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+              },
+            body: JSON.stringify(thisDiscountCode)
         }
     );
     let res = await response.json()

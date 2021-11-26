@@ -93,20 +93,44 @@ app.post('/searchFlight', async function (req, res)
     return; 
 });
 
-app.post('/buyTicket', async function (req, res)
+app.post('/saveTicketInfo', async function (req, res)
 {
     console.log('Got buyTicket body:', req.body);
     // c is thisCustomer
     let t = req.body; 
+    console.log(t)
+    let q
+    /*try 
+    {
+        q = await pool.query
+        (
+            `BEGIN;
+            INSERT INTO `
+        );
+    }
+    catch(err) {console.log(err.message);}
+    console.log(q.rows);*/
+    //var r = JSON.stringify(q.rows)
+
+    // send stuff back to frontend
+    res.json(q.rows);
+    //res.sendStatus(200);
+    console.log("Added a valid ticket to the database");
+    return; 
+});
+
+app.post('/ticketBasePrice', async function (req, res)
+{
+    console.log('Got buyTicket body:', req.body);
+    let f = req.body; 
 
     try 
     {
         var q = await pool.query
         (
-            `SELECT * FROM flight WHERE 
-            departure_airport_id = (SELECT airport_id FROM airport WHERE airport_city = '${f.departureAirport}')
-            AND 
-            arrival_airport_id = (SELECT airport_id FROM airport WHERE airport_city = '${f.arrivalAirport}');`
+            `SELECT base_ticket_cost 
+            FROM flight
+            WHERE flight_id = ${f.flight_id};`
         );
     }
     catch(err) {console.log(err.message);}
@@ -116,7 +140,32 @@ app.post('/buyTicket', async function (req, res)
     // send stuff back to frontend
     res.json(q.rows);
     //res.sendStatus(200);
-    console.log("Added a valid ticket to the database");
+    console.log("Got flight_id base cost");
+    return; 
+});
+
+app.post('/discountInfo', async function (req, res)
+{
+    console.log('Got buyTicket body:', req.body);
+    let d = req.body; 
+
+    try 
+    {
+        var q = await pool.query
+        (
+            `SELECT discount_amount, discount_type 
+            FROM discount
+            WHERE discount_code = ${d.discount_code};`
+        );
+    }
+    catch(err) {console.log(err.message);}
+    console.log(q.rows);
+    //var r = JSON.stringify(q.rows)
+
+    // send stuff back to frontend
+    res.json(q.rows);
+    //res.sendStatus(200);
+    console.log("Got discount_amount and discount_type");
     return; 
 });
 

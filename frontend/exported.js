@@ -1,5 +1,6 @@
-import { saveCustomer } from "../test/databaseFunctions.js";
-import { getFlightsDetails } from "../test/databaseFunctions.js";
+import { getDiscountInfo, saveCustomer, getFlightsDetails, saveTicketInfo } from "../test/databaseFunctions.js";
+//import { getFlightsDetails } from "../test/databaseFunctions.js";
+//import "../test/databaseFunctions.js";
 
 let customers = []
 const addCustomer = async (ev)=>{
@@ -40,7 +41,8 @@ document.addEventListener('DOMContentLoaded', ()=>{
 });
 
 function checkValidForm(field) {
-    return field === ''
+    // returns true if field is not empty
+    return field != ''
 }
 
 function setProperNullValueIfNull(field) {
@@ -49,37 +51,85 @@ function setProperNullValueIfNull(field) {
     }
     return field
 }
+function calculateTotalFlightCost(baseTicketCost, discountAmount, discountType, classType) {
+    let classCostMultiplier
+    let totalFlightCost
+
+    if (classType === 'Economy') {
+        classCostMultiplier = 1
+    } else if (classType === 'Business') {
+        classCostMultiplier = 3
+    } else { // else classType === 'first_class'
+        classCostMultiplier = 5
+    }
+
+    if (discountType === 'NA') {
+        return totalFlightCost = baseTicketCost * classCostMultiplier 
+    } else if (discountType === 'Percent') {
+        return totalFlightCost = baseTicketCost * classCostMultiplier * discountAmount
+    } else { // else discountType === 'Dollar'
+        return totalFlightCost = baseTicketCost * classCostMultiplier - discountAmount
+    }
+}
+
 
 const buyTicketInfo = async(ev)=>{
     ev.preventDefault();  //to stop the form submitting
     let ticketInfo = []
-    let validTicketInfo = []
-    ticketInfo = document.querySelectorAll(".buyTicketInfo")
-    ticketInfo.forEach(element => {
+    let allValidTickets = []
+    ticketInfo = document.querySelectorAll('.buyTicketInfo')
+    ticketInfo.forEach(thisTicketInfo => {
         let isValidForm = true
 
-        let ssn = element.querySelectorAll('ssn')
+        let ssn = thisTicketInfo.querySelectorAll('.ssn')[0].value
         isValidForm = isValidForm && checkValidForm(ssn)
+        //console.log(ssn)
 
-        let flightID = element.querySelectorAll('flight_id')
+        let flightID = thisTicketInfo.querySelectorAll('.flight_id')[0].value
         isValidForm = isValidForm && checkValidForm(flightID)
 
-        let classType = element.querySelectorAll('classType')
+        let classType = thisTicketInfo.querySelectorAll('.classType')[0].value
         isValidForm = isValidForm && checkValidForm(classType)
+        //console.log(classType)
 
-        let creditCardNum = element.querySelectorAll('creditCardNum')
+        let creditCardNum = thisTicketInfo.querySelectorAll('.creditCardNum')[0].value
         isValidForm = isValidForm && checkValidForm(creditCardNum)
 
-        let discountCode = element.querySelectorAll('discountCode')
+        let discountCode = thisTicketInfo.querySelectorAll('.discountCode')[0].value
         discountCode = setProperNullValueIfNull(discountCode)
 
-        let numBags = element.querySelectorAll('numBags')
+        let numBags = thisTicketInfo.querySelectorAll('.numBags')[0].value
         isValidForm = isValidForm && checkValidForm(numBags)
 
         if (isValidForm) {
-            validTicketInfo.push(element)
+            const thisValidTicketInfo = {
+                ssn: ssn,
+                flightID: flightID,
+                classType: classType,
+                creditCardNum: creditCardNum,
+                discountCode: discountCode,
+                numBags: numBags
+            }
+            allValidTickets.push(thisValidTicketInfo)
         }
     }) 
+
+    let res = await saveTicketInfo(allValidTickets)
+
+    validTicketInfo.forEach(thisTicket => {
+        let baseTicketCost = getTicketBasePrice(thisTicket)
+        let discountInfo = getDiscountInfo(thisTicket)
+
+        let discountAmount = discountInfo.discountAmount
+        let discountType = discountInfo.discountType
+        let classType = thisTicket.classType
+
+        let totalCost = calculateTotalFlightCost(baseTicketCost, discountAmount, discountType, classType)
+        thisTicket.totalCost = totalCost
+    
+    })
+
+    
     //let result = await (validTicketInfo)
     //console.log(result)
 }

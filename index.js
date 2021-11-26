@@ -44,10 +44,10 @@ app.post('/addCustomer', async function (req, res)
     console.log('Got addCustomer body:', req.body);
     // c is thisCustomer
     let c = req.body; 
-
+    let q
     try 
     {
-        var q = await pool.query
+        q = await pool.query
         (
             `BEGIN;
                 INSERT INTO customer (ssn, first_name, last_name, email, phone_num)
@@ -55,12 +55,13 @@ app.post('/addCustomer', async function (req, res)
             END;`
         );
     }
-    catch(err) {console.log(err.message);}
-    console.log(q.rows);
-    //var r = JSON.stringify(q.rows)
+    catch(err) {
+        console.log(err.message);
+        return; 
+    }
 
     // send stuff back to frontend
-    res.json(q.rows);
+    res.json('Success');
     //res.sendStatus(200);
     console.log("Added a customer to the database");
     return; 
@@ -89,39 +90,55 @@ app.post('/searchFlight', async function (req, res)
     // send stuff back to frontend
     res.json(q.rows);
     //res.sendStatus(200);
-    console.log("Added a customer to the database");
+    console.log("Returned flight(s) from database");
     return; 
 });
 
 app.post('/saveTicketInfo', async function (req, res)
 {
     console.log('Got buyTicket body:', req.body);
-    // c is thisCustomer
-    let t = req.body; 
-    console.log(t)
     let q
-    /*try 
+    var t = req.body
+    //console.log(t)
+    let query = `BEGIN TRANSACTION;\n`
+    for(i = 0; i < t.length; i++) {
+        query = query + 
+        `WITH ins${i} AS (
+        INSERT INTO boarding_pass (flight_id, gate_code, class_type, num_bags)
+        VALUES (${t[i].flightID}, (SELECT departure_gate_code FROM flight WHERE flight_id = ${t[i].flightID}), '${t[i].classType}', ${t[i].numBags})
+        RETURNING ticket_no
+        )
+    
+        INSERT INTO payment (ticket_no, ssn, credit_card_num, taxes, discount_code, final_price, flight_id, is_cancelled)
+        VALUES ((SELECT ticket_no FROM ins${i}), '${t[i].ssn}', '${t[i].creditCardNum}', 'NA', '${t[i].discountCode}', ${t[i].totalCost}, ${t[i].flightID}, FALSE);\n`
+    }
+    query = query + `END TRANSACTION;`
+    console.log(query)
+    try 
     {
         q = await pool.query
         (
-            `BEGIN;
-            INSERT INTO `
+            `${query}`
         );
     }
-    catch(err) {console.log(err.message);}
-    console.log(q.rows);*/
-    //var r = JSON.stringify(q.rows)
+    catch(err) {
+        console.log(err.message);
+        res.json('Failed to buy tickets')
+        return;
+    }
+    //console.log(q.rows);
+    //res = JSON.stringify(q.rows)
 
     // send stuff back to frontend
-    res.json(q.rows);
+    res.json('Successfully bought ticket(s)');
     //res.sendStatus(200);
-    console.log("Added a valid ticket to the database");
+    console.log("Added valid ticket(s) to the database");
     return; 
 });
 
 app.post('/ticketBasePrice', async function (req, res)
 {
-    console.log('Got buyTicket body:', req.body);
+    console.log('Got ticketBasePrice body:', req.body);
     let f = req.body; 
 
     try 
@@ -130,10 +147,13 @@ app.post('/ticketBasePrice', async function (req, res)
         (
             `SELECT base_ticket_cost 
             FROM flight
-            WHERE flight_id = ${f.flight_id};`
+            WHERE flight_id = ${f.flightID};`
         );
     }
-    catch(err) {console.log(err.message);}
+    catch(err) {
+        console.log(err.message);
+        return; 
+    }
     console.log(q.rows);
     //var r = JSON.stringify(q.rows)
 
@@ -146,19 +166,23 @@ app.post('/ticketBasePrice', async function (req, res)
 
 app.post('/discountInfo', async function (req, res)
 {
-    console.log('Got buyTicket body:', req.body);
+    console.log('Got discountInfo body:', req.body);
     let d = req.body; 
+    let q
 
     try 
     {
-        var q = await pool.query
+        q = await pool.query
         (
             `SELECT discount_amount, discount_type 
             FROM discount
-            WHERE discount_code = ${d.discount_code};`
+            WHERE discount_code = '${d.discountCode}';`
         );
     }
-    catch(err) {console.log(err.message);}
+    catch(err) {
+        console.log(err.message);
+        return;
+    }
     console.log(q.rows);
     //var r = JSON.stringify(q.rows)
 

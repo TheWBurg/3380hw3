@@ -1,4 +1,4 @@
-import { getDiscountInfo, saveCustomer, getFlightsDetails, saveTicketInfo } from "../test/databaseFunctions.js";
+import { getDiscountInfo, saveCustomer, getFlightsDetails, saveTicketInfo, getTicketBasePrice } from "../test/databaseFunctions.js";
 //import { getFlightsDetails } from "../test/databaseFunctions.js";
 //import "../test/databaseFunctions.js";
 
@@ -64,12 +64,35 @@ function calculateTotalFlightCost(baseTicketCost, discountAmount, discountType, 
     }
 
     if (discountType === 'NA') {
-        return totalFlightCost = baseTicketCost * classCostMultiplier 
+        totalFlightCost = baseTicketCost * classCostMultiplier 
+        return totalFlightCost
     } else if (discountType === 'Percent') {
-        return totalFlightCost = baseTicketCost * classCostMultiplier * discountAmount
+        totalFlightCost = baseTicketCost * classCostMultiplier * discountAmount
+        return totalFlightCost
     } else { // else discountType === 'Dollar'
-        return totalFlightCost = baseTicketCost * classCostMultiplier - discountAmount
+        totalFlightCost = baseTicketCost * classCostMultiplier - discountAmount
+        return totalFlightCost
     }
+}
+
+async function getTotalTicketCost(allValidTicketsArray) {
+    for(const thisTicket of allValidTicketsArray) {
+        let res = await getTicketBasePrice(thisTicket)
+        let ticketBasePrice = res[0].base_ticket_cost
+        console.log(ticketBasePrice)
+
+        let discountInfo = await getDiscountInfo(thisTicket)
+        let discountAmount = discountInfo[0].discount_amount
+        let discountType = discountInfo[0].discount_type
+        console.log(discountType)
+        let classType = thisTicket.classType
+
+        let totalCost = calculateTotalFlightCost(ticketBasePrice, discountAmount, discountType, classType)
+        console.log('totalCost = ' + totalCost)
+        thisTicket['totalCost'] = totalCost
+        console.log(thisTicket)
+    }
+    return allValidTicketsArray
 }
 
 
@@ -102,6 +125,7 @@ const buyTicketInfo = async(ev)=>{
         isValidForm = isValidForm && checkValidForm(numBags)
 
         if (isValidForm) {
+            // creates a dictionary if the ticket info is valid and  pushes it to an array of valid tickets
             const thisValidTicketInfo = {
                 ssn: ssn,
                 flightID: flightID,
@@ -113,22 +137,8 @@ const buyTicketInfo = async(ev)=>{
             allValidTickets.push(thisValidTicketInfo)
         }
     }) 
-
+    allValidTickets = await getTotalTicketCost(allValidTickets)
     let res = await saveTicketInfo(allValidTickets)
-
-    validTicketInfo.forEach(thisTicket => {
-        let baseTicketCost = getTicketBasePrice(thisTicket)
-        let discountInfo = getDiscountInfo(thisTicket)
-
-        let discountAmount = discountInfo.discountAmount
-        let discountType = discountInfo.discountType
-        let classType = thisTicket.classType
-
-        let totalCost = calculateTotalFlightCost(baseTicketCost, discountAmount, discountType, classType)
-        thisTicket.totalCost = totalCost
-    
-    })
-
     
     //let result = await (validTicketInfo)
     //console.log(result)

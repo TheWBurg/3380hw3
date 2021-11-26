@@ -1,9 +1,42 @@
-import { getDiscountInfo, saveCustomer, getFlightsDetails, saveTicketInfo, getTicketBasePrice } from "../test/databaseFunctions.js";
+import { getDiscountInfo, saveCustomer, getFlightsDetails, saveTicketInfo, getTicketBasePrice, checkSSN } from "../test/databaseFunctions.js";
 //import { getFlightsDetails } from "../test/databaseFunctions.js";
 //import "../test/databaseFunctions.js";
 
+// this function checks for valid fields when a customer is registered. 
+// if optionnal fields are left blank, their values are updated to NA, which is what we are 
+// using isntead of nulls inside the database
+function validCustomerDetails(cust) {
+    if (cust.ssn === '') {
+        // do something to say invalid 
+        return false;
+    }
+    if (cust.first_name === '') {
+        // do something to say invalid 
+        return false;
+    }
+    if (cust.last_name === '') {
+        // do something to say invalid 
+        return false;
+    }
+    if (cust.email === '') {
+        cust.email = 'NA'
+    }
+    if (cust.phone_num === '') {
+        cust.phone_num = 'NA'
+    }
+    return true; 
+}
+
+async function ssnExists(cust) {
+    if (await checkSSN(cust) === 0) { // if rowCount === 0
+        return false
+    } else {
+        return true
+    }
+}
+
 let customers = []
-const addCustomer = async (ev)=>{
+const addCustomer = async (ev)=> {
     ev.preventDefault();  //to stop the form submitting
     let thisCustomer = {
         ssn: document.getElementById('ssn').value,
@@ -12,9 +45,20 @@ const addCustomer = async (ev)=>{
         email: document.getElementById('email').value,
         phone_num: document.getElementById('phoneNum').value
     }
-    // call saveCustomer
-    let res = await saveCustomer(thisCustomer);
-    console.log(res);
+    let doesSsnExist = await ssnExists(thisCustomer)
+    let isValidCustDetails = validCustomerDetails(thisCustomer)
+    //thisCustomer = validCustomerDetails(thisCustomer)
+
+    if (isValidCustDetails === false) {
+        document.getElementById('resgiterCustomerResults').innerText = "SSN, First Name, and Last Name fields are required. \n Please try again."
+    } else if(doesSsnExist === true) {
+        document.getElementById('resgiterCustomerResults').innerText = "ERROR: This SSN is already registered. Please try a different SSN"
+    } else {
+        let res = await saveCustomer(thisCustomer);
+        document.getElementById('resgiterCustomerResults').innerText = "Successfully registered this user!"
+        console.log(res);
+    }
+
     //console.log
     customers.push(thisCustomer);
     //document.forms[0].reset(); // to clear the form for the next entries
@@ -45,12 +89,15 @@ function checkValidForm(field) {
     return field != ''
 }
 
+// helper funcction to put allowed missing field values into the proper form we want to insert
+// into the database. 
 function setProperNullValueIfNull(field) {
     if (field === '') {
         return field = 'NA'
     }
     return field
 }
+
 function calculateTotalFlightCost(baseTicketCost, discountAmount, discountType, classType) {
     let classCostMultiplier
     let totalFlightCost
@@ -79,18 +126,17 @@ async function getTotalTicketCost(allValidTicketsArray) {
     for(const thisTicket of allValidTicketsArray) {
         let res = await getTicketBasePrice(thisTicket)
         let ticketBasePrice = res[0].base_ticket_cost
-        console.log(ticketBasePrice)
+        //console.log(ticketBasePrice)
 
         let discountInfo = await getDiscountInfo(thisTicket)
         let discountAmount = discountInfo[0].discount_amount
         let discountType = discountInfo[0].discount_type
-        console.log(discountType)
         let classType = thisTicket.classType
 
         let totalCost = calculateTotalFlightCost(ticketBasePrice, discountAmount, discountType, classType)
-        console.log('totalCost = ' + totalCost)
+        //console.log('totalCost = ' + totalCost)
         thisTicket['totalCost'] = totalCost
-        console.log(thisTicket)
+        //console.log(thisTicket)
     }
     return allValidTicketsArray
 }
@@ -100,7 +146,16 @@ const buyTicketInfo = async(ev)=>{
     ev.preventDefault();  //to stop the form submitting
     let ticketInfo = []
     let allValidTickets = []
+
+    // This gets all of the values entered by the user when they buy tickets
+    // it creates an array of length 5 for, as we ask for info for 5 tickets
+    // if the fields are left empty, it still makes a ticket in the array for it 
     ticketInfo = document.querySelectorAll('.buyTicketInfo')
+
+    // this loop goes through the array of tickets and creates a new array that only contains 
+    // valid tickets. currently it an invalid ticket is one that is missing values from any of the fields
+    // besides discount code
+    // TODO: add much more error checking 
     ticketInfo.forEach(thisTicketInfo => {
         let isValidForm = true
 
@@ -125,7 +180,7 @@ const buyTicketInfo = async(ev)=>{
         isValidForm = isValidForm && checkValidForm(numBags)
 
         if (isValidForm) {
-            // creates a dictionary if the ticket info is valid and  pushes it to an array of valid tickets
+            // creates a dictionary if the ticket info is valid and pushes it to an array of valid tickets
             const thisValidTicketInfo = {
                 ssn: ssn,
                 flightID: flightID,
@@ -137,6 +192,8 @@ const buyTicketInfo = async(ev)=>{
             allValidTickets.push(thisValidTicketInfo)
         }
     }) 
+    // using the valid ticket information, this queries the database for the base ticket cost,
+    // discount codes, and calculates the final cost. 
     allValidTickets = await getTotalTicketCost(allValidTickets)
     let res = await saveTicketInfo(allValidTickets)
     

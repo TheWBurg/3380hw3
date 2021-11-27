@@ -208,15 +208,16 @@
             <form class="cancelTicketInfo">
                 <div class="formBox">
                     <label for="ssn">SSN (required)</label>
-                    <input type="text" class="ssn" placeholder="SSN" required/>
+                    <input type="text" id="ssnForCancel" placeholder="SSN" required/>
                 </div>
                 <div class="formBox">
                     <label for="ticketNo">Ticket Number (required)</label>
-                    <input type="text" class="ticketNo" placeholder="Ticket Number" required/>
+                    <input type="text" id="ticketNoForCancel" placeholder="Ticket Number" required/>
                 </div>
                 <div class="formBox">
                     <button id="cancelTicketBtn">Click to Cancel</button>
                 </div>
+                <span id="checkCancelResults"></span>
             </form>
         </div>
         </div>

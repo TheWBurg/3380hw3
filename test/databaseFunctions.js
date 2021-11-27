@@ -103,3 +103,27 @@ export async function getTicketDetails(tick) {
     console.log(res)
     return res;
 }
+
+export async function cancelThisTicket(tick) {
+    const response = await fetch(`http://localhost:5000/cancelTicket`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+            },
+        body: JSON.stringify(tick)});
+    let res = await response.json()
+    console.log(res)
+    return res;
+}
+
+export async function getClassType(tick) {
+    const response = await fetch(`http://localhost:5000/getClassType`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+            },
+        body: JSON.stringify(tick)});
+    let res = await response.json()
+    console.log(res)
+    return res;
+}

@@ -106,7 +106,11 @@ app.post('/saveTicketInfo', async function (req, res) {
         RETURNING ticket_no)
     
         INSERT INTO payment (ticket_no, ssn, credit_card_num, taxes, discount_code, final_price, flight_id, is_cancelled)
-        VALUES ((SELECT ticket_no FROM ins${i}), '${t[i].ssn}', '${t[i].creditCardNum}', 'NA', '${t[i].discountCode}', ${t[i].totalCost}, ${t[i].flightID}, FALSE);\n`
+        VALUES ((SELECT ticket_no FROM ins${i}), '${t[i].ssn}', '${t[i].creditCardNum}', 'NA', '${t[i].discountCode}', ${t[i].totalCost}, ${t[i].flightID}, FALSE);
+        
+        UPDATE flight
+        SET ${t[i].classType}_seat_left  = (SELECT ${t[i].classType}_seat_left FROM flight WHERE flight_id = ${t[i].flightID}) - 1
+        WHERE flight_id = ${t[i].flightID};\n`
     }
     query = query + `END TRANSACTION;`
     console.log(query)
@@ -259,7 +263,7 @@ app.post('/getTicketDetails', async function (req, res) {
         res.json(err.message)
         return;
     }
-    console.log(q);
+    console.log(q.rows);
     // send stuff back to frontend
     res.json(q.rows);
     //res.sendStatus(200);
@@ -267,7 +271,70 @@ app.post('/getTicketDetails', async function (req, res) {
     return; 
 });
 
+
+app.post('/cancelticket', async function (req, res) {
+    console.log('Got cancelTicket body:', req.body);
+    let t = req.body; 
+    let q
+
+    let seatsLeftDict = {
+        economy: "economy_seat_left",
+        business: "business_seat_left",
+        firstClass: "first_class_seat_left"
+    }
+    //console.log(seatsLeftDict[t.classType])
+
+    try {
+        q = await pool.query (
+            `BEGIN TRANSACTION;  
+
+            UPDATE payment 
+            SET is_cancelled = true
+            WHERE ticket_no = ${t.ticket_no};
+            
+            UPDATE flight
+            SET ${seatsLeftDict[t.classType]} = ${seatsLeftDict[t.classType]} + 1
+            WHERE flight_id = (SELECT flight_id FROM boarding_pass WHERE ticket_no = ${t.ticket_no});
+            
+            
+            END TRANSACTION;`
+        );
+    }
+    catch(err) {
+        console.log(err.message);
+        res.json(err.message)
+        return;
+    }
+    //console.log();
+    // send stuff back to frontend
+    res.json("Successfuly Cancelled Ticket");
+    console.log("Cancelled Ticket");
+    return; 
+});
+
+app.post('/getClassType', async function (req, res) {
+    console.log('Got classType body:', req.body);
+    let t = req.body; 
+    let q
+    try {
+        q = await pool.query (
+            `SELECT class_type
+            FROM boarding_pass
+            WHERE ticket_no = ${t.ticket_no};`
+        );
+    }
+    catch(err) {
+        console.log(err.message);
+        res.json(err.message)
+        return;
+    }
+    console.log(q.rows);
+    // send stuff back to frontend
+    res.json(q.rows);
+    console.log("Checked Class Type");
+    return; 
+});
+
 var server = app.listen(5000, function () {
     console.log('Server is listening at port 5000...');
 });
-

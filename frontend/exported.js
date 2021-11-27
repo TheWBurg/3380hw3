@@ -1,4 +1,4 @@
-import { getDiscountInfo, saveCustomer, getFlightsDetails, saveTicketInfo, getTicketBasePrice, checkSSN, checkTicket, getTicketDetails} from "../test/databaseFunctions.js";
+import { getDiscountInfo, saveCustomer, getFlightsDetails, saveTicketInfo, getTicketBasePrice, checkSSN, checkTicket, getTicketDetails, cancelThisTicket, getClassType} from "../test/databaseFunctions.js";
 //import { getFlightsDetails } from "../test/databaseFunctions.js";
 //import "../test/databaseFunctions.js";
 
@@ -117,7 +117,7 @@ function calculateTotalFlightCost(baseTicketCost, discountAmount, discountType, 
     let classCostMultiplier
     let totalFlightCost
 
-    if (classType === 'Economy') {
+    if (classType === 'Economy' || classType === 'economy') {
         classCostMultiplier = 1
     } else if (classType === 'Business') {
         classCostMultiplier = 3
@@ -220,7 +220,25 @@ document.addEventListener('DOMContentLoaded', ()=>{
 });
 
 const cancelTicket = async(ev) => {
-    let isValidTicketDetails = validTicketDetails(ticketDetails)
+    ev.preventDefault();  //to stop the form submitting
+    let thisTicket = {
+        ssn: document.getElementById('ssnForCancel').value,
+        ticket_no: document.getElementById('ticketNoForCancel').value
+    }
+
+    if (validTicketDetails(thisTicket) === false) {
+        document.getElementById('checkCancelResults').innerText = "SSN and Ticket Number are required. \n Please try again."
+    } else if (ticketExists(thisTicket) === false) {
+        document.getElementById('checkCancelResults').innerText = "A ticket with this Ticket Number and SSN does not exist. \n Please try again."
+    } else {
+        let thisClassType = await getClassType(thisTicket)
+        //console.log("this class type: " + thisClassType[0].class_type)
+        thisTicket["classType"] = thisClassType[0].class_type
+        console.log(thisTicket.classType)
+        let res = await cancelThisTicket(thisTicket)
+        document.getElementById('checkCancelResults').innerText = "Your ticket has been cancelled."
+    }
+
 
 }
 document.addEventListener('DOMContentLoaded', ()=>{
@@ -236,7 +254,7 @@ const checkTicketStatus = async(ev) => {
     
     if (validTicketDetails(thisTicket) === false) {
         document.getElementById('checkStatusResults').innerText = "SSN and Ticket Number are required. \n Please try again."
-    } else if (ticketExists === false) {
+    } else if (ticketExists(thisTicket) === false) {
         document.getElementById('checkStatusResults').innerText = "A ticket with this Ticket Number and SSN does not exist. \n Please try again."
     } else {
         let res = await getTicketDetails(thisTicket)

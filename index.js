@@ -96,6 +96,11 @@ app.post('/saveTicketInfo', async function (req, res) {
     console.log('Got buyTicket body:', req.body);
     let q
     var t = req.body
+    let seatsLeftDict = {
+        economy: "economy_seat_left",
+        business: "business_seat_left",
+        first: "first_class_seat_left"
+    }
     //console.log(t)
     let query = `BEGIN TRANSACTION;\n`
     for(i = 0; i < t.length; i++) {
@@ -109,7 +114,7 @@ app.post('/saveTicketInfo', async function (req, res) {
         VALUES ((SELECT ticket_no FROM ins${i}), '${t[i].ssn}', '${t[i].creditCardNum}', 'NA', '${t[i].discountCode}', ${t[i].totalCost}, ${t[i].flightID}, FALSE);
         
         UPDATE flight
-        SET ${t[i].classType}_seat_left  = (SELECT ${t[i].classType}_seat_left FROM flight WHERE flight_id = ${t[i].flightID}) - 1
+        SET ${seatsLeftDict[t[i].classType]}  = (SELECT  ${seatsLeftDict[t[i].classType]} FROM flight WHERE flight_id = ${t[i].flightID}) - 1
         WHERE flight_id = ${t[i].flightID};\n`
     }
     query = query + `END TRANSACTION;`
@@ -119,14 +124,14 @@ app.post('/saveTicketInfo', async function (req, res) {
     }
     catch(err) {
         console.log(err.message);
-        res.json(err.message)
+        res.json("Error: Could not add valid ticket(s) to the database")
         return;
     }
     //console.log(q.rows);
     //res = JSON.stringify(q.rows)
 
     // send stuff back to frontend
-    res.json('Successfully bought ticket(s)');
+    res.json("Successfully bought tickets");
     //res.sendStatus(200);
     console.log("Added valid ticket(s) to the database");
     return; 
@@ -280,7 +285,7 @@ app.post('/cancelticket', async function (req, res) {
     let seatsLeftDict = {
         economy: "economy_seat_left",
         business: "business_seat_left",
-        firstClass: "first_class_seat_left"
+        first: "first_class_seat_left"
     }
     //console.log(seatsLeftDict[t.classType])
 

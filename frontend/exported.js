@@ -5,6 +5,13 @@ import { getDiscountInfo, saveCustomer, getFlightsDetails, saveTicketInfo, getTi
 // this function checks for valid fields when a customer is registered. 
 // if optionnal fields are left blank, their values are updated to NA, which is what we are 
 // using isntead of nulls inside the database
+function isValidClassType(field) {
+    if(field != 'economy' && field != 'business' && field != 'first') {
+        return false
+    } 
+    return true
+}
+
 function validCustomerDetails(cust) {
     if (cust.ssn === '') {
         return false
@@ -97,6 +104,7 @@ const searchFlight = async(ev)=>{
 }
 document.addEventListener('DOMContentLoaded', ()=>{
     document.getElementById('searchFlightBtn').addEventListener('click', searchFlight);
+    document.querySelector('form').reset();
 });
 
 function checkValidForm(field) {
@@ -117,11 +125,11 @@ function calculateTotalFlightCost(baseTicketCost, discountAmount, discountType, 
     let classCostMultiplier
     let totalFlightCost
 
-    if (classType === 'Economy' || classType === 'economy') {
+    if (classType === 'economy') {
         classCostMultiplier = 1
-    } else if (classType === 'Business') {
+    } else if (classType === 'business') {
         classCostMultiplier = 3
-    } else { // else classType === 'first_class'
+    } else { // else classType === 'first'
         classCostMultiplier = 5
     }
 
@@ -182,8 +190,10 @@ const buyTicketInfo = async(ev)=>{
         isValidForm = isValidForm && checkValidForm(flightID)
 
         let classType = thisTicketInfo.querySelectorAll('.classType')[0].value
-        isValidForm = isValidForm && checkValidForm(classType)
-        //console.log(classType)
+        classType.toLowerCase();
+        console.log(classType)
+        let isValidClass = isValidClassType(classType)
+        isValidForm = isValidForm && isValidClass && checkValidForm(classType)
 
         let creditCardNum = thisTicketInfo.querySelectorAll('.creditCardNum')[0].value
         isValidForm = isValidForm && checkValidForm(creditCardNum)
@@ -205,15 +215,28 @@ const buyTicketInfo = async(ev)=>{
                 numBags: numBags
             }
             allValidTickets.push(thisValidTicketInfo)
+            //console.log(allValidTickets)
         }
     }) 
-    // using the valid ticket information, this queries the database for the base ticket cost,
-    // discount codes, and calculates the final cost. 
+
     allValidTickets = await getTotalTicketCost(allValidTickets)
     let res = await saveTicketInfo(allValidTickets)
-    
-    //let result = await (validTicketInfo)
-    //console.log(result)
+
+    // using the valid ticket information, this queries the database for the base ticket cost,
+    // discount codes, and calculates the final cost.
+    // It then displays which tickets were sucessfully bought
+    console.log('length:' + allValidTickets.length)
+    if(allValidTickets.length > 0) {
+        if(res === 'Successfully bought tickets') {
+            for(let i = 0; i < allValidTickets.length; i++){
+                document.getElementById(`buyTicketsResults${i}`).innerText = 
+                `Successfully bought a ticket for ${allValidTickets[i].ssn} on flight ${allValidTickets[i].flightID}\n`
+            }
+        }
+        console.log(res)
+    }
+
+    document.querySelector('form').reset();
 }
 document.addEventListener('DOMContentLoaded', ()=>{
     document.getElementById('buyTicketBtn').addEventListener('click', buyTicketInfo);
@@ -234,9 +257,10 @@ const cancelTicket = async(ev) => {
         let thisClassType = await getClassType(thisTicket)
         //console.log("this class type: " + thisClassType[0].class_type)
         thisTicket["classType"] = thisClassType[0].class_type
-        console.log(thisTicket.classType)
+        //console.log(thisTicket.classType)
         let res = await cancelThisTicket(thisTicket)
         document.getElementById('checkCancelResults').innerText = "Your ticket has been cancelled."
+        document.querySelector('form').reset();
     }
 
 
@@ -259,6 +283,7 @@ const checkTicketStatus = async(ev) => {
     } else {
         let res = await getTicketDetails(thisTicket)
         document.getElementById('checkStatusResults').innerText = JSON.stringify(res); 
+        document.querySelector('form').reset();
     }
 }
 document.addEventListener('DOMContentLoaded', ()=>{

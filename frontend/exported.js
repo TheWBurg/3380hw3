@@ -1,4 +1,4 @@
-import { getDiscountInfo, saveCustomer, getFlightsDetails, saveTicketInfo, getTicketBasePrice, checkSSN } from "../test/databaseFunctions.js";
+import { getDiscountInfo, saveCustomer, getFlightsDetails, saveTicketInfo, getTicketBasePrice, checkSSN, checkTicket, getTicketDetails} from "../test/databaseFunctions.js";
 //import { getFlightsDetails } from "../test/databaseFunctions.js";
 //import "../test/databaseFunctions.js";
 
@@ -7,16 +7,13 @@ import { getDiscountInfo, saveCustomer, getFlightsDetails, saveTicketInfo, getTi
 // using isntead of nulls inside the database
 function validCustomerDetails(cust) {
     if (cust.ssn === '') {
-        // do something to say invalid 
-        return false;
+        return false
     }
     if (cust.first_name === '') {
-        // do something to say invalid 
-        return false;
+        return false
     }
     if (cust.last_name === '') {
-        // do something to say invalid 
-        return false;
+        return false
     }
     if (cust.email === '') {
         cust.email = 'NA'
@@ -27,12 +24,29 @@ function validCustomerDetails(cust) {
     return true; 
 }
 
+function validTicketDetails(tick) {
+    if (tick.ssn === '') {
+        return false
+    }
+    if (tick.ticket_no === '') {
+        return false
+    }
+    return true; 
+}
+
+async function ticketExists(tick) {
+    if (await checkTicket(tick) === 0) { // if rowCount === 0
+        return false
+    }
+    return true
+}
+
+// checks to see if the ssn already exists on the database. 
 async function ssnExists(cust) {
     if (await checkSSN(cust) === 0) { // if rowCount === 0
         return false
-    } else {
-        return true
-    }
+    } 
+    return true
 }
 
 let customers = []
@@ -57,12 +71,13 @@ const addCustomer = async (ev)=> {
         let res = await saveCustomer(thisCustomer);
         document.getElementById('resgiterCustomerResults').innerText = "Successfully registered this user!"
         console.log(res);
+        document.querySelector('form').reset();
     }
 
     //console.log
     customers.push(thisCustomer);
     //document.forms[0].reset(); // to clear the form for the next entries
-    document.querySelector('form').reset();
+
 }
 document.addEventListener('DOMContentLoaded', ()=>{
     document.getElementById('addCustomerBtn').addEventListener('click', addCustomer);
@@ -153,7 +168,7 @@ const buyTicketInfo = async(ev)=>{
     ticketInfo = document.querySelectorAll('.buyTicketInfo')
 
     // this loop goes through the array of tickets and creates a new array that only contains 
-    // valid tickets. currently it an invalid ticket is one that is missing values from any of the fields
+    // valid tickets. currently an invalid ticket is one that is missing values from any of the fields
     // besides discount code
     // TODO: add much more error checking 
     ticketInfo.forEach(thisTicketInfo => {
@@ -204,4 +219,31 @@ document.addEventListener('DOMContentLoaded', ()=>{
     document.getElementById('buyTicketBtn').addEventListener('click', buyTicketInfo);
 });
 
+const cancelTicket = async(ev) => {
+    let isValidTicketDetails = validTicketDetails(ticketDetails)
+
+}
+document.addEventListener('DOMContentLoaded', ()=>{
+    document.getElementById('cancelTicketBtn').addEventListener('click', cancelTicket);
+});
+
+const checkTicketStatus = async(ev) => {
+    ev.preventDefault();  //to stop the form submitting
+    let thisTicket = {
+        ssn: document.getElementById('ssnForStatus').value,
+        ticket_no: document.getElementById('ticketNoForStatus').value
+    }
+    
+    if (validTicketDetails(thisTicket) === false) {
+        document.getElementById('checkStatusResults').innerText = "SSN and Ticket Number are required. \n Please try again."
+    } else if (ticketExists === false) {
+        document.getElementById('checkStatusResults').innerText = "A ticket with this Ticket Number and SSN does not exist. \n Please try again."
+    } else {
+        let res = await getTicketDetails(thisTicket)
+        document.getElementById('checkStatusResults').innerText = JSON.stringify(res); 
+    }
+}
+document.addEventListener('DOMContentLoaded', ()=>{
+    document.getElementById('checkStatusBtn').addEventListener('click', checkTicketStatus);
+});
 

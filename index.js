@@ -205,6 +205,68 @@ app.post('/checkSSN', async function (req, res) {
     console.log("Checked SSN");
     return; 
 });
+
+app.post('/checkTicket', async function (req, res) {
+    console.log('Got checkTicket body:', req.body);
+    let t = req.body; 
+    let q
+
+    try {
+        q = await pool.query (
+            `SELECT ticket_no, ssn
+            FROM payment
+            WHERE ticket_no = ${t.ticket_no} AND ssn = '${t.ssn}';`
+        );
+    }
+    catch(err) {
+        console.log(err.message);
+        res.json(err.message)
+        return;
+    }
+    console.log(q.rowCount);
+    // send stuff back to frontend
+    res.json(q.rowCount);
+    //res.sendStatus(200);
+    console.log("Checked Ticket");
+    return; 
+});
+app.post('/getTicketDetails', async function (req, res) {
+    console.log('Got getTicketDetails body:', req.body);
+    let t = req.body; 
+    let q
+    try {
+        q = await pool.query (
+            `SELECT
+            boarding_pass.ticket_no, boarding_pass.flight_id, boarding_pass.class_type, boarding_pass.num_bags, 
+            payment.final_price, payment.is_cancelled, 
+            flight.departure_airport_id, flight.arrival_airport_id, flight.sch_departure_time, flight.sch_arrival_time, 
+            flight.status, flight.departure_gate_code, flight.arrival_gate_code,
+            depAirport.airport_name, depAirport.airport_city, 
+			arAirport.airport_name, arAirport.airport_city
+
+            FROM boarding_pass
+
+            INNER JOIN payment ON boarding_pass.ticket_no = payment.ticket_no
+            INNER JOIN flight ON boarding_pass.flight_id = flight.flight_id
+            INNER JOIN airport depAirport ON flight.departure_airport_id = depAirport.airport_id 
+            INNER JOIN airport arAirport ON flight.arrival_airport_id = arAirport.airport_id
+
+            WHERE payment.ticket_no = ${t.ticket_no} AND payment.ssn = '${t.ssn}';`
+        );
+    }
+    catch(err) {
+        console.log(err.message);
+        res.json(err.message)
+        return;
+    }
+    console.log(q);
+    // send stuff back to frontend
+    res.json(q.rows);
+    //res.sendStatus(200);
+    console.log("Got Ticket Details");
+    return; 
+});
+
 var server = app.listen(5000, function () {
     console.log('Server is listening at port 5000...');
 });

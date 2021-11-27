@@ -79,3 +79,27 @@ export async function checkSSN(cust) {
     console.log(res)
     return res;
 }
+
+export async function checkTicket(tick) {
+    const response = await fetch(`http://localhost:5000/checkTicket`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+            },
+        body: JSON.stringify(tick)});
+    let res = await response.json()
+    console.log(res)
+    return res;
+}
+
+export async function getTicketDetails(tick) {
+    const response = await fetch(`http://localhost:5000/getTicketDetails`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+            },
+        body: JSON.stringify(tick)});
+    let res = await response.json()
+    console.log(res)
+    return res;
+}

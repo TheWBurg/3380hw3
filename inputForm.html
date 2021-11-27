@@ -204,10 +204,38 @@
             </div>
         </div>
         <div class="cancelTicket">
-            <h2>Cancel Tickets</h2>
+            <h2>Cancel Ticket</h2>
+            <form class="cancelTicketInfo">
+                <div class="formBox">
+                    <label for="ssn">SSN (required)</label>
+                    <input type="text" class="ssn" placeholder="SSN" required/>
+                </div>
+                <div class="formBox">
+                    <label for="ticketNo">Ticket Number (required)</label>
+                    <input type="text" class="ticketNo" placeholder="Ticket Number" required/>
+                </div>
+                <div class="formBox">
+                    <button id="cancelTicketBtn">Click to Cancel</button>
+                </div>
+            </form>
+        </div>
         </div>
         <div class="checkStatus">
             <h2>Check Status of Your Ticket</h2>
+            <form class="checkStatusInfo">
+                <div class="formBox">
+                    <label for="ssn">SSN (required)</label>
+                    <input type="text" id="ssnForStatus" placeholder="SSN" required/>
+                </div>
+                <div class="formBox">
+                    <label for="ticketNo">Ticket Number (required)</label>
+                    <input type="text" id="ticketNoForStatus" placeholder="Ticket Number" required/>
+                </div>
+                <div class="formBox">
+                    <button id="checkStatusBtn">Click to Check Status</button>
+                </div>
+                <span id="checkStatusResults"></span>
+            </form>
         </div>
         <div id="msg">
             <pre></pre>

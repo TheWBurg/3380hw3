@@ -127,3 +127,40 @@ export async function getClassType(tick) {
     console.log(res)
     return res;
 }
+
+export async function doesFlightIdExist(tick) {
+    const response = await fetch(`http://localhost:5000/doesFlightIdExist`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+            },
+        body: JSON.stringify(tick)});
+    let res = await response.json()
+    console.log(res)
+    return res;
+}
+
+export async function doesSsnExist(tick) {
+    const response = await fetch(`http://localhost:5000/doesSsnExist`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+            },
+        body: JSON.stringify(tick)});
+    let res = await response.json()
+    console.log(res)
+    return res;
+}
+
+export async function howManySeatsLeft(tick) {
+    const response = await fetch(`http://localhost:5000/howManySeatsLeft`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+            },
+        body: JSON.stringify(tick)});
+    let res = await response.json()
+    console.log(res)
+    return res;
+}
+

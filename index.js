@@ -7,7 +7,7 @@ app.use(express.static('public'));
 // middleware
 app.use(cors());
 app.use(express.json());   
-
+app.use(express.static(__dirname));
  
 //async function getTable(table_name){
 app.get('/select/:table_name', async function (req, res) {
@@ -95,13 +95,13 @@ app.post('/searchFlight', async function (req, res) {
 app.post('/saveTicketInfo', async function (req, res) {
     console.log('Got buyTicket body:', req.body);
     let q
-    var t = req.body
+    let t = req.body
     let seatsLeftDict = {
         economy: "economy_seat_left",
         business: "business_seat_left",
         first: "first_class_seat_left"
     }
-    //console.log(t)
+
     let query = `BEGIN TRANSACTION;\n`
     for(i = 0; i < t.length; i++) {
         query = query + 
@@ -125,16 +125,11 @@ app.post('/saveTicketInfo', async function (req, res) {
     catch(err) {
         console.log(err.message);
         res.json("Error: Could not add valid ticket(s) to the database")
-        return;
+        return
     }
-    //console.log(q.rows);
-    //res = JSON.stringify(q.rows)
-
-    // send stuff back to frontend
     res.json("Successfully bought tickets");
-    //res.sendStatus(200);
     console.log("Added valid ticket(s) to the database");
-    return; 
+    return
 });
 
 app.post('/ticketBasePrice', async function (req, res) {
@@ -331,7 +326,7 @@ app.post('/cancelticket', async function (req, res) {
         // send stuff back to frontend
         res.json("Successfully Cancelled Ticket");
         console.log("Cancelled Ticket");
-        return;
+        return
     }
     return; 
 });
@@ -357,6 +352,89 @@ app.post('/getClassType', async function (req, res) {
     res.json(q.rows);
     console.log("Checked Class Type");
     return; 
+});
+app.post('/doesFlightIdExist', async function (req, res) {
+    console.log('Got doesFlightIdExist body:', req.body);
+    let f = req.body; 
+    let q
+
+    try {
+        q = await pool.query (
+            `SELECT *
+            FROM flight
+            WHERE flight_id = '${f.flightID}';`
+        );
+    }
+    catch(err) {
+        console.log(err.message);
+        res.json(err.message)
+        return;
+    }
+    if (q.rowCount === 0) {
+        res.json(false)
+        return 
+    } else {
+        res.json(true)
+        return
+    }
+});
+
+app.post('/howManySeatsLeft', async function (req, res) {
+    console.log('Got howManySeatsLeft body:', req.body);
+    let s = req.body; 
+    let q
+
+    let seatsLeftDict = {
+        economy: "economy_seat_left",
+        business: "business_seat_left",
+        first: "first_class_seat_left"
+    }
+
+    try {
+        q = await pool.query (
+            `SELECT ${seatsLeftDict[s.classType]}
+            FROM flight
+            WHERE flight_id = '${s.flightID}';`
+        );
+    }
+    catch(err) {
+        console.log(err.message);
+        res.json(err.message)
+        return;
+    }
+    if (q.rowCount === 0) {
+        res.json('Invalid flightID')
+        return 
+    } else {
+        res.json(q.rows)
+        return
+    }
+});
+
+app.post('/doesSsnExist', async function (req, res) {
+    console.log('Got doesSsnExist body:', req.body);
+    let c = req.body; 
+    let q
+
+    try {
+        q = await pool.query (
+            `SELECT 
+            FROM customer
+            WHERE ssn = '${c.ssn}';`
+        );
+    }
+    catch(err) {
+        console.log(err.message);
+        res.json(err.message)
+        return;
+    }
+    if (q.rowCount === 0) {
+        res.json(false)
+        return 
+    } else {
+        res.json(true)
+        return
+    }
 });
 
 var server = app.listen(5000, function () {

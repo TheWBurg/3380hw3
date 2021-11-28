@@ -101,7 +101,7 @@ const addCustomer = async (ev)=> {
     }
 
     //console.log
-    customers.push(thisCustomer);
+    //customers.push(thisCustomer);
     //document.forms[0].reset(); // to clear the form for the next entries
 
 }
@@ -125,11 +125,6 @@ document.addEventListener('DOMContentLoaded', ()=>{
     document.getElementById('searchFlightBtn').addEventListener('click', searchFlight);
     document.querySelector('form').reset();
 });
-
-function checkValidForm(field) {
-    // returns true if field is not empty
-    return field != ''
-}
 
 // helper funcction to put allowed missing field values into the proper form we want to insert
 // into the database. 
@@ -233,7 +228,12 @@ const buyTicketInfo = async(ev)=>{
                     discountCode: discountCode,
                     numBags: numBags
                 }
-                allValidTickets.push(thisValidTicketInfo)
+
+                //let ssnRes = await doesSsnExist(thisValidTicketInfo)
+                //let flightIdRes = await doesFlightIdExist(thisValidTicketInfo)
+                //let seatsLeftRes = await howManySeatsLeft(thisValidTicketInfo)
+
+                allValidTickets.push(thisValidTicketInfo)     
             } 
             if(!isSsnValid) {
                 thisTicketInfo.querySelectorAll(`.error_ssn`)[0].innerText = "SSN is required. Please fill in a value"
@@ -252,16 +252,19 @@ const buyTicketInfo = async(ev)=>{
     // using the valid ticket information, this queries the database for the base ticket cost,
     // discount codes, and calculates the final cost.
     // It then displays which tickets were sucessfully bought
-    console.log('length:' + allValidTickets.length)
+    
+    //console.log('length:' + allValidTickets.length)
     if(allValidTickets.length > 0) {
+
+
         allValidTickets = await getTotalTicketCost(allValidTickets)
-        let res = await saveTicketInfo(allValidTickets)
-        if(res === 'Successfully bought tickets') {
+        let saveTickRes = await saveTicketInfo(allValidTickets)
+        if(saveTickRes === 'Successfully bought tickets') {
             for(let i = 0; i < allValidTickets.length; i++){
                 document.getElementById(`buyTicketsResults${i}`).innerText = 
                 `Successfully bought a ticket for the person with SSN: ${allValidTickets[i].ssn} on flight with flightID: ${allValidTickets[i].flightID}\n`
             }
-        } else if(res === 'Error: Could not add valid ticket(s) to the database') {
+        } else if(saveTickRes === 'Error: Could not add valid ticket(s) to the database') {
             document.getElementById(`buyTicketsResults`).innerText = 
                 `Error: Could not buy tickets.\n`
         }
@@ -296,7 +299,13 @@ const cancelTicket = async(ev) => {
         thisTicket["classType"] = thisClassType[0].class_type
         //console.log(thisTicket.classType)
         let res = await cancelThisTicket(thisTicket)
-        document.getElementById('checkCancelResults').innerText = "Your ticket has been cancelled."
+        if (res === "Ticket already cancelled") {
+            document.getElementById('checkCancelResults').innerText = "This ticket has already been cancelled."
+        } else if (res === "Successfully Cancelled Ticket") {
+            document.getElementById('checkCancelResults').innerText = "Your ticket has been cancelled."
+        } else {
+            document.getElementById('checkCancelResults').innerText = "An error has occured."
+        }
         document.querySelector('form').reset();
     }
 

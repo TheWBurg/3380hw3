@@ -280,7 +280,7 @@ app.post('/getTicketDetails', async function (req, res) {
 app.post('/cancelticket', async function (req, res) {
     console.log('Got cancelTicket body:', req.body);
     let t = req.body; 
-    let q
+    let q, c
 
     let seatsLeftDict = {
         economy: "economy_seat_left",
@@ -290,30 +290,49 @@ app.post('/cancelticket', async function (req, res) {
     //console.log(seatsLeftDict[t.classType])
 
     try {
-        q = await pool.query (
-            `BEGIN TRANSACTION;  
-
-            UPDATE payment 
-            SET is_cancelled = true
-            WHERE ticket_no = ${t.ticket_no};
-            
-            UPDATE flight
-            SET ${seatsLeftDict[t.classType]} = ${seatsLeftDict[t.classType]} + 1
-            WHERE flight_id = (SELECT flight_id FROM boarding_pass WHERE ticket_no = ${t.ticket_no});
-            
-            
-            END TRANSACTION;`
-        );
-    }
-    catch(err) {
+        c = await pool.query (
+            `SELECT *
+            FROM PAYMENT
+            WHERE ticket_no = ${t.ticket_no} AND is_cancelled = FALSE;`
+        )
+        
+    } catch(err) {
         console.log(err.message);
         res.json(err.message)
         return;
     }
-    //console.log();
-    // send stuff back to frontend
-    res.json("Successfuly Cancelled Ticket");
-    console.log("Cancelled Ticket");
+
+    if(c.rowCount === 0) {
+        res.json("Ticket already cancelled")
+        return
+    } else {
+        try {
+            q = await pool.query (
+                `BEGIN TRANSACTION;  
+
+                UPDATE payment 
+                SET is_cancelled = true
+                WHERE ticket_no = ${t.ticket_no};
+                
+                UPDATE flight
+                SET ${seatsLeftDict[t.classType]} = ${seatsLeftDict[t.classType]} + 1
+                WHERE flight_id = (SELECT flight_id FROM boarding_pass WHERE ticket_no = ${t.ticket_no});
+                
+                
+                END TRANSACTION;`
+            );
+        }
+        catch(err) {
+            console.log(err.message);
+            res.json(err.message)
+            return;
+        }
+        //console.log();
+        // send stuff back to frontend
+        res.json("Successfully Cancelled Ticket");
+        console.log("Cancelled Ticket");
+        return;
+    }
     return; 
 });
 

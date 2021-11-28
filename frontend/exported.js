@@ -2,6 +2,25 @@ import { getDiscountInfo, saveCustomer, getFlightsDetails, saveTicketInfo, getTi
 //import { getFlightsDetails } from "../test/databaseFunctions.js";
 //import "../test/databaseFunctions.js";
 
+
+
+function clearContent(){
+    document.getElementById('buyTicketsResults').innerText = ''
+    document.getElementById('buyTicketsResults0').innerText = ''
+    document.getElementById('buyTicketsResults1').innerText = ''
+    document.getElementById('buyTicketsResults2').innerText = ''
+    document.getElementById('buyTicketsResults3').innerText = ''
+    document.getElementById('buyTicketsResults4').innerText = ''
+    let elements = []
+    elements = document.querySelectorAll('.buyTicketInfo')
+    elements.forEach(thisElement => {
+        thisElement.querySelectorAll(`.error_ssn`)[0].innerText = ''
+        thisElement.querySelectorAll(`.error_flight_id`)[0].innerText = ''
+        thisElement.querySelectorAll(`.error_creditCardNum`)[0].innerText = ''
+        thisElement.querySelectorAll(`.error_numBags`)[0].innerText = ''
+    })
+
+}
 // this function checks for valid fields when a customer is registered. 
 // if optionnal fields are left blank, their values are updated to NA, which is what we are 
 // using isntead of nulls inside the database
@@ -167,11 +186,12 @@ async function getTotalTicketCost(allValidTicketsArray) {
 
 const buyTicketInfo = async(ev)=>{
     ev.preventDefault();  //to stop the form submitting
+    //clearContent();
     let ticketInfo = []
     let allValidTickets = []
 
     // This gets all of the values entered by the user when they buy tickets
-    // it creates an array of length 5 for, as we ask for info for 5 tickets
+    // it creates an array of length 5, as we ask for info for 5 tickets
     // if the fields are left empty, it still makes a ticket in the array for it 
     ticketInfo = document.querySelectorAll('.buyTicketInfo')
 
@@ -180,64 +200,81 @@ const buyTicketInfo = async(ev)=>{
     // besides discount code
     // TODO: add much more error checking 
     ticketInfo.forEach(thisTicketInfo => {
-        let isValidForm = true
 
         let ssn = thisTicketInfo.querySelectorAll('.ssn')[0].value
-        isValidForm = isValidForm && checkValidForm(ssn)
-        //console.log(ssn)
+        // checks if ssn is empty string and assign that boolean value to a variable
+        const isSsnValid = (ssn != '')
 
         let flightID = thisTicketInfo.querySelectorAll('.flight_id')[0].value
-        isValidForm = isValidForm && checkValidForm(flightID)
+        const isFlightIDValid = (flightID != '')
 
-        let classType = thisTicketInfo.querySelectorAll('.classType')[0].value
-        classType.toLowerCase();
-        console.log(classType)
-        let isValidClass = isValidClassType(classType)
-        isValidForm = isValidForm && isValidClass && checkValidForm(classType)
+        let classType = thisTicketInfo.querySelectorAll('.classType')[0].value.toLowerCase()
 
         let creditCardNum = thisTicketInfo.querySelectorAll('.creditCardNum')[0].value
-        isValidForm = isValidForm && checkValidForm(creditCardNum)
+        const isCreditCardNumValid = (creditCardNum != '')
 
         let discountCode = thisTicketInfo.querySelectorAll('.discountCode')[0].value
         discountCode = setProperNullValueIfNull(discountCode)
 
         let numBags = thisTicketInfo.querySelectorAll('.numBags')[0].value
-        isValidForm = isValidForm && checkValidForm(numBags)
+        const isNumBagsValid = (numBags != '')
 
-        if (isValidForm) {
-            // creates a dictionary if the ticket info is valid and pushes it to an array of valid tickets
-            const thisValidTicketInfo = {
-                ssn: ssn,
-                flightID: flightID,
-                classType: classType,
-                creditCardNum: creditCardNum,
-                discountCode: discountCode,
-                numBags: numBags
+        // If these are not all false, then we will either have an error of a valid form 
+        // If they are all false, that means the form was left blank, which is fine 
+        if(![isSsnValid, isFlightIDValid, isCreditCardNumValid, isNumBagsValid].every(val => val === false)) {
+            if([isSsnValid, isFlightIDValid, isCreditCardNumValid, isNumBagsValid].every(val => val === true)) {
+                // This means we have a valid form
+                // creates a dictionary if the ticket info is valid and pushes it to an array of valid tickets
+                const thisValidTicketInfo = {
+                    ssn: ssn,
+                    flightID: flightID,
+                    classType: classType,
+                    creditCardNum: creditCardNum,
+                    discountCode: discountCode,
+                    numBags: numBags
+                }
+                allValidTickets.push(thisValidTicketInfo)
+            } 
+            if(!isSsnValid) {
+                thisTicketInfo.querySelectorAll(`.error_ssn`)[0].innerText = "SSN is required. Please fill in a value"
             }
-            allValidTickets.push(thisValidTicketInfo)
-            //console.log(allValidTickets)
+            if(!isFlightIDValid) {
+                thisTicketInfo.querySelectorAll(`.error_flight_id`)[0].innerText = "Flight ID is required. Please fill in a value"
+            }
+            if(!isCreditCardNumValid) {
+                thisTicketInfo.querySelectorAll(`.error_creditCardNum`)[0].innerText = "Credit card number is required. Please fill in a value"
+            }
+            if(!isNumBagsValid) {
+                thisTicketInfo.querySelectorAll(`.error_numBags`)[0].innerText = "Number of bags is required. Please fill in a value"
+            }
         }
     }) 
-
-    allValidTickets = await getTotalTicketCost(allValidTickets)
-    let res = await saveTicketInfo(allValidTickets)
-
     // using the valid ticket information, this queries the database for the base ticket cost,
     // discount codes, and calculates the final cost.
     // It then displays which tickets were sucessfully bought
     console.log('length:' + allValidTickets.length)
     if(allValidTickets.length > 0) {
+        allValidTickets = await getTotalTicketCost(allValidTickets)
+        let res = await saveTicketInfo(allValidTickets)
         if(res === 'Successfully bought tickets') {
             for(let i = 0; i < allValidTickets.length; i++){
                 document.getElementById(`buyTicketsResults${i}`).innerText = 
-                `Successfully bought a ticket for ${allValidTickets[i].ssn} on flight ${allValidTickets[i].flightID}\n`
+                `Successfully bought a ticket for the person with SSN: ${allValidTickets[i].ssn} on flight with flightID: ${allValidTickets[i].flightID}\n`
             }
+        } else if(res === 'Error: Could not add valid ticket(s) to the database') {
+            document.getElementById(`buyTicketsResults`).innerText = 
+                `Error: Could not buy tickets.\n`
         }
         console.log(res)
+    } else {
+        document.getElementById(`buyTicketsResults`).innerText = `Error: Please enter valid information to buy a ticket\n`
     }
 
     document.querySelector('form').reset();
 }
+document.addEventListener('DOMContentLoaded', ()=>{
+    document.getElementById('buyTicketBtn').addEventListener('click', clearContent);
+});
 document.addEventListener('DOMContentLoaded', ()=>{
     document.getElementById('buyTicketBtn').addEventListener('click', buyTicketInfo);
 });

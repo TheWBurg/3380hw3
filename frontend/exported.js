@@ -131,6 +131,9 @@ const searchFlight = async(ev)=>{
             //editing the table in inputForm.html
             let flightInfo = document.querySelector("#flightInfo");
             let flightInfoPush = "";
+            if(res == 0){
+                document.getElementById('flightResults').innerText = "no flights";
+            }
             for(let i=0; i<res.length; i++){
                 flightInfoPush += 
                 `<tr>
@@ -149,8 +152,11 @@ const searchFlight = async(ev)=>{
         try{
             let res = await getConnectedFlightDetails(flightCities);
             //editing the table in inputForm.html
-            let flightInfo = document.querySelector("#connectedFlightInfo");
+            //let flightInfo = document.querySelector("#connectedFlightInfo");
             let flightInfoPush = "";
+            if(res.length == 0){
+                document.getElementById('connectedFlightResults').innerText = "No flights";
+            }
             for(let i=0; i<res.length; i++){
                 flightInfoPush += 
                 `<tr>

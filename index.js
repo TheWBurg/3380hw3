@@ -102,9 +102,9 @@ app.post('/searchConnectedFlight', async function (req, res) {
             t1.sch_departure_time, t1.sch_arrival_time AS layover_arrival_time, t2.sch_departure_time AS layover_departure_time, t2.sch_arrival_time AS destination_arrival_time
             FROM flight AS t1
             INNER JOIN flight AS t2 ON t2.departure_airport_id = t1.arrival_airport_id
-            WHERE t1.departure_airport_id = 'DEN'
+            WHERE t1.departure_airport_id = (SELECT airport_id FROM airport WHERE airport_city = '${f.departureAirport}')
             AND
-            t2.arrival_airport_id = 'HOU'
+            t2.arrival_airport_id = (SELECT airport_id FROM airport WHERE airport_city = '${f.arrivalAirport}')
             AND 
             t1.sch_arrival_time < t2.sch_departure_time;
             `

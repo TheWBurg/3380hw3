@@ -99,7 +99,9 @@ app.post('/searchConnectedFlight', async function (req, res) {
     try {
         q = await pool.query(
             `SELECT t1.flight_id AS flight_id1, t2.flight_id AS flight_id2, t1.departure_airport_id, t1.arrival_airport_id AS layover_airport_id, t2.arrival_airport_id AS destination_airport_id, 
-            t1.sch_departure_time, t1.sch_arrival_time AS layover_arrival_time, t2.sch_departure_time AS layover_departure_time, t2.sch_arrival_time AS destination_arrival_time
+            t1.sch_departure_time, t1.sch_arrival_time AS layover_arrival_time, t2.sch_departure_time AS layover_departure_time, t2.sch_arrival_time AS destination_arrival_time,
+            t1.economy_seat_left AS t1_econ, t2.economy_seat_left AS t2_econ, t1.business_seat_left AS t1_bus, t2.business_seat_left AS t2_bus, t1.first_class_seat_left AS t1_first, 
+            t2.first_class_seat_left AS t2_first
             FROM flight AS t1
             INNER JOIN flight AS t2 ON t2.departure_airport_id = t1.arrival_airport_id
             WHERE t1.departure_airport_id = (SELECT airport_id FROM airport WHERE airport_city = '${f.departureAirport}')

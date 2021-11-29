@@ -1,4 +1,4 @@
-import { getDiscountInfo, saveCustomer, getFlightsDetails, saveTicketInfo, getTicketBasePrice, checkSSN, checkTicket, getTicketDetails, cancelThisTicket, getClassType, doesSsnExist, doesFlightIdExist, howManySeatsLeft} from "../test/databaseFunctions.js";
+import { getDiscountInfo, saveCustomer, getFlightsDetails, getConnectedFlightDetails, saveTicketInfo, getTicketBasePrice, checkSSN, checkTicket, getTicketDetails, cancelThisTicket, getClassType, doesSsnExist, doesFlightIdExist, howManySeatsLeft} from "../test/databaseFunctions.js";
 //import { getFlightsDetails } from "../test/databaseFunctions.js";
 //import "../test/databaseFunctions.js";
 
@@ -108,22 +108,6 @@ const addCustomer = async (ev)=> {
 }
 document.addEventListener('DOMContentLoaded', ()=>{
     document.getElementById('addCustomerBtn').addEventListener('click', addCustomer);
-});
-
-
-const searchFlight = async(ev)=>{
-    ev.preventDefault();  //to stop the form submitting
-    let flightCities = {
-        departureAirport: document.getElementById('departureCity').value,
-        arrivalAirport: document.getElementById('arrivalCity').value,
-    }
-    let res = await getFlightsDetails(flightCities);
-    console.log(res);
-
-    document.getElementById('flightFesults').innerText = JSON.stringify(res); 
-}
-document.addEventListener('DOMContentLoaded', ()=>{
-    document.getElementById('searchFlightBtn').addEventListener('click', searchFlight);
     document.querySelector('form').reset();
 });
 
@@ -135,6 +119,71 @@ function setProperNullValueIfNull(field) {
     }
     return field
 }
+
+
+const searchFlight = async(ev)=>{
+    ev.preventDefault();  //to stop the form submitting
+    let flightCities = {
+        departureAirport: document.getElementById('departureCity').value,
+        arrivalAirport: document.getElementById('arrivalCity').value,
+    }
+    //these are going directly to index.js
+    //let departureAirportCodes = await fetch(`http://localhost:5000/cityToCode/${flightCities.departureAirport}`);
+    //let arrivalAirportCodes = await fetch(`http://localhost:5000/cityToCode/${flightCities.arrivalAirport}`);
+    
+    
+    //console.log(res);
+    //for(let j = 0; j<departureAirportCodes.length;j++){
+        try{
+            let res = await getFlightsDetails(flightCities);
+            //editing the table in inputForm.html
+            let flightInfo = document.querySelector("#flightInfo");
+            let flightInfoPush = "";
+            for(let i=0; i<res.length; i++){
+                flightInfoPush += 
+                `<tr>
+                <th>${res[i].flight_id}</th>
+                <th>${res[i].sch_departure_time}</th>
+                <th>${res[i].sch_arrival_time}</th>
+                <th>${res[i].departure_airport_id}</th>
+                <th>${res[i].arrival_airport_id}</th>
+                </tr>`;
+            }   
+            flightInfo.innerHTML = flightInfoPush;
+        }
+        catch(err){
+            console.log(err.message);
+        }
+        try{
+            let res = await getConnectedFlightDetails(flightCities);
+            //editing the table in inputForm.html
+            let flightInfo = document.querySelector("#connectedFlightInfo");
+            let flightInfoPush = "";
+            for(let i=0; i<res.length; i++){
+                flightInfoPush += 
+                `<tr>
+                <th>${res[i].flight_id1}</th>
+                <th>${res[i].flight_id2}</th>
+                <th>${res[i].departure_airport_id}</th>
+                <th>${res[i].layover_airport_id}</th>
+                <th>${res[i].destination_airport_id}</th>
+                <th>${res[i].sch_departure_time}</th>
+                <th>${res[i].layover_arrival_time}</th>
+                <th>${res[i].layover_departure_time}</th>
+                <th>${res[i].destination_arrival_time}</th>
+                </tr>`;
+            }   
+            connectedFlightInfo.innerHTML = flightInfoPush;
+        }
+        catch(err){
+            console.log(err.message);
+        }
+    //}
+    
+}
+document.addEventListener('DOMContentLoaded', ()=>{
+    document.getElementById('searchFlightBtn').addEventListener('click', searchFlight);
+});
 
 function calculateTotalFlightCost(baseTicketCost, discountAmount, discountType, classType) {
     let classCostMultiplier

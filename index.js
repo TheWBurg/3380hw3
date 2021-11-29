@@ -92,6 +92,38 @@ app.post('/searchFlight', async function (req, res) {
     return; 
 });
 
+app.post('/searchConnectedFlight', async function (req, res) {
+    console.log('Got searchConnectedFlight body:', req.body);
+    let f = req.body; 
+    let q
+    try {
+        q = await pool.query(
+            `SELECT t1.flight_id AS flight_id1, t2.flight_id AS flight_id2, t1.departure_airport_id, t1.arrival_airport_id AS layover_airport_id, t2.arrival_airport_id AS destination_airport_id, 
+            t1.sch_departure_time, t1.sch_arrival_time AS layover_arrival_time, t2.sch_departure_time AS layover_departure_time, t2.sch_arrival_time AS destination_arrival_time
+            FROM flight AS t1
+            INNER JOIN flight AS t2 ON t2.departure_airport_id = t1.arrival_airport_id
+            WHERE t1.departure_airport_id = 'DEN'
+            AND
+            t2.arrival_airport_id = 'HOU'
+            AND 
+            t1.sch_arrival_time < t2.sch_departure_time;
+            `
+        );
+        console.log(q);
+    }
+    catch(err) {
+        console.log(err.message);
+        res.json(err.message)
+    }
+    //var r = JSON.stringify(q.rows)
+
+    // send stuff back to frontend
+    res.json(q.rows);
+    //res.sendStatus(200);
+    console.log("Returned flight(s) from database");
+    return; 
+});
+
 app.post('/saveTicketInfo', async function (req, res) {
     console.log('Got buyTicket body:', req.body);
     let q

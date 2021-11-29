@@ -27,6 +27,18 @@ export async function getFlightsDetails(flightCities) {
     return res;
 }
 
+export async function getConnectedFlightDetails(flightCities){
+    const response = await fetch(`http://localhost:5000/searchConnectedFlight`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+            },
+        body: JSON.stringify(flightCities)});
+    let res = await response.json()
+    console.log("here");
+    return res;
+}
+
 export async function saveTicketInfo(validTicketInfo) 
 {
     // do validation

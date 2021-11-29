@@ -324,10 +324,10 @@ app.post('/getTicketDetails', async function (req, res) {
 
             f2.sch_departure_time AS f2_sch_departure_time, f2.sch_arrival_time AS f2_sch_arrival_time, 
             f2.status AS f2_status, f2.departure_gate_code AS f2_departure_gate_code, f2.arrival_gate_code AS f2_arrival_gate_code,
-            depAirport.airport_name AS f1_dep_airport_name, depAirport.airport_city AS f1_dep_airport_name, 
-
-			arAirport.airport_name AS f1_arr_airport_name, arAirport.airport_city AS f1_arr_airport_name,
-            arFinalAirport.airport_name AS f2_arr_airport_name, arFinalAirport.airport_city AS f2_arr_airport_name
+            
+            depAirport.airport_name AS f1_dep_airport_name, depAirport.airport_city AS f1_dep_airport_city_name, 
+			arAirport.airport_name AS f1_arr_airport_name, arAirport.airport_city AS f1_arr_airport_city_name,
+            arFinalAirport.airport_name AS f2_arr_airport_name, arFinalAirport.airport_city AS f2_arr_airport_ciy_name
 
             FROM boarding_pass
 

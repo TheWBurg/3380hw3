@@ -124,6 +124,12 @@ app.post('/saveTicketInfo', async function (req, res) {
     }
     catch(err) {
         console.log(err.message);
+        if(err.message === `new row for relation "flight" violates check constraint "first_class_seat_left_nonnegative"`
+            || err.message === `new row for relation "flight" violates check constraint "business_seat_left_nonnegative"`
+            || err.message === `new row for relation "flight" violates check constraint "economy_seat_left_nonnegative"`) {
+            res.json('Error: not enough seats left')
+            return
+        }
         res.json("Error: Could not add valid ticket(s) to the database")
         return
     }

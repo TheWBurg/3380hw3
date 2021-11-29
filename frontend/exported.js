@@ -278,17 +278,24 @@ const buyTicketInfo = async(ev)=>{
     // It then displays which tickets were sucessfully bought
     console.log('length:' + allFullyValidedTickets.length)
     if(allFullyValidedTickets.length > 0 && (allFullyValidedTickets.length === allValidTickets.length)) {
+
         allFullyValidedTickets = await getTotalTicketCost(allFullyValidedTickets)
         let saveTickRes = await saveTicketInfo(allFullyValidedTickets)
+
         if(saveTickRes === 'Successfully bought tickets') {
             for(let i = 0; i < allFullyValidedTickets.length; i++){
+
                 document.getElementById(`buyTicketsResults${i}`).innerText = 
                 `Successfully bought a ticket for the person with SSN: ${allFullyValidedTickets[i].ssn} on flight with flightID: ${allFullyValidedTickets[i].flightID}\n`
             }
         } else if(saveTickRes === 'Error: Could not add valid ticket(s) to the database') {
             document.getElementById(`buyTicketsResults`).innerText = `Error: Could not buy tickets.\n`
-        } 
-        console.log(res)
+        } else if(saveTickRes === 'Error: not enough seats left') {
+            document.getElementById(`buyTicketsResults`).innerText = 
+            `Error: Not enough seats left for the seating class for at least one of the tickets you wanted to buy.
+            Either choose a different class, add yourself to the waitlist, or try again later`
+        }
+        //console.log(res)
     } else {
         document.getElementById(`buyTicketsResults`).innerText = `Error: Please enter valid information to buy a ticket\n`
     }

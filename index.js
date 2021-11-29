@@ -148,8 +148,8 @@ app.post('/saveTicketInfo', async function (req, res) {
     for(i = 0; i < t.length; i++) {
         query = query + 
         `WITH ins${i} AS (
-        INSERT INTO boarding_pass (flight_id, flight_id_2, gate_code, gate_code_2, class_type, num_bags)
-        VALUES (${t[i].flightID}, ${t[i].flightID2}, (SELECT departure_gate_code FROM flight WHERE flight_id = ${t[i].flightID}), (SELECT departure_gate_code FROM flight WHERE flight_id = ${t[i].flightID2}), '${t[i].classType}', ${t[i].numBags})
+        INSERT INTO boarding_pass (flight_id, flight_id_2, gate_code, gate_code_2, class_type, num_bags, is_waitlisted)
+        VALUES (${t[i].flightID}, ${t[i].flightID2}, (SELECT departure_gate_code FROM flight WHERE flight_id = ${t[i].flightID}), (SELECT departure_gate_code FROM flight WHERE flight_id = ${t[i].flightID2}), '${t[i].classType}', ${t[i].numBags}, 'FALSE')
         RETURNING ticket_no)
     
         INSERT INTO payment (ticket_no, ssn, credit_card_num, taxes, discount_code, final_price, flight_id, flight_id_2, is_cancelled)
@@ -552,21 +552,115 @@ app.post('/doesSsnExist', async function (req, res) {
 
 app.post('/saveWaitListInfo', async function (req, res) {
     console.log('Got saveWaitListInfo body:', req.body);
-    let w = req.body; 
-    let q
+    let w = req.body[0]; 
+    let q, r, s
 
     let seatsLeftDict = {
         economy: "economy_seat_left",
         business: "business_seat_left",
         first: "first_class_seat_left"
     }
+    
+    //check if there is no room on the given flight(s)
+    // if no room, add to waitlist
+    // if there is room, just add to the flight instead
+    try {
+        q = await pool.query (
+            `SELECT f1.${seatsLeftDict[w.classType]} AS f1_seatLeft, f2.${seatsLeftDict[w.classType]} AS f2_seatLeft
+            FROM flight AS f1, flight AS f2
+            WHERE f1.flight_id = ${w.flightID} AND f2.flight_id = ${w.flightID2}
+            GROUP BY f1_seatLeft, f2_seatLeft
+            HAVING f1.${seatsLeftDict[w.classType]} > 0 AND f2.${seatsLeftDict[w.classType]} > 0;`
+        );
+    } catch(err) {
+        console.log(err.message);
+        res.json(err.message)
+        return;
+    }
+
+    if (q.rowCount > 0) {
+        try {
+            r = await pool.query (
+                `BEGIN TRANSACTION; 
+                CREATE TEMP TABLE waitlistInfo(
+                    waitlist_id INT,
+                    ssn VARCHAR(50),
+                    flightID VARCHAR(50),
+                    flightID2 VARCHAR(50),
+                    position INT
+                );
+                
+                WITH ins0 AS (
+                INSERT INTO boarding_pass (flight_id, flight_id_2, gate_code, gate_code_2, class_type, num_bags, is_waitlisted)
+                VALUES (${w.flightID}, ${w.flightID2}, (SELECT departure_gate_code FROM flight WHERE flight_id = ${w.flightID}), (SELECT departure_gate_code FROM flight WHERE flight_id = ${w.flightID2}), '${w.classType}', ${w.numBags}, 'TRUE')
+                RETURNING ticket_no)
+            
+                INSERT INTO payment (ticket_no, ssn, credit_card_num, taxes, discount_code, final_price, flight_id, flight_id_2, is_cancelled)
+                VALUES ((SELECT ticket_no FROM ins0), '${w.ssn}', '${w.creditCardNum}', 'NA', '${w.discountCode}', ${w.totalCost}, ${w.flightID}, ${w.flightID2}, FALSE);
+    
+                INSERT INTO waitlist (waitlist_id, ssn, flight_id, flight_id_2, is_waitlisted)
+                VALUES ((SELECT ticket_no FROM payment ORDER BY payment DESC limit 1), ${w.ssn}, ${w.flightID}, ${w.flightID2}, 'TRUE');
+        
+                INSERT INTO waitlistInfo(waitlist_id, ssn, flightID, flightID2, position)
+                values ((SELECT waitlist_id FROM waitlist ORDER BY waitlist_id DESC limit 1), ${w.ssn}, ${w.flightID}, ${w.flightID2}, (SELECT position FROM waitlist ORDER BY waitlist_id DESC limit 1));
+                    
+                END TRANSACTION;
+            `)
+            
+        } catch(err) {
+            console.log(err.message);
+            res.json("Error adding to waitlist")
+            return;
+        }
+        
+        s = await pool.query (`SELECT * FROM waitlistInfo;`)
+        console.log(s.rows)
+        res.json(s.rows)
+        return
+
+    } else {
+        res.json("There are seats left on this flight.")
+        return;
+    }
+});
+
+var server = app.listen(5000, function () {
+    console.log('Server is listening at port 5000...');
+});
+
+app.post('/getWaitListPosition', async function (req, res) {
+    console.log('Got getWaitListPosition body:', req.body);
+    let p = req.body[0]; 
+    let q
 
     try {
         q = await pool.query (
-            
-            //check if there is no room on the given flight(s)
-            //if no room, add to waitlist
+            `SELECT position
+            FROM waitlist
+            WHERE position <= '${p.position}' AND is_waitlisted = 'TRUE'
+            ORDER BY position ASC;`
+        );
+    }
+    catch(err) {
+        console.log(err.message);
+        res.json(err.message)
+        return;
+    }
+    res.json(q.rowCount)
+    return 
+ 
+});
 
+app.post('/doesDiscountCodeExist', async function (req, res) {
+    console.log('Got doesDiscountCodeExist body:', req.body);
+    let d = req.body; 
+    let q
+
+    try {
+        q = await pool.query (
+            `SELECT discount_code
+            FROM discount
+            WHERE discount_code = '${d.discountCode}';`
         );
     }
     catch(err) {
@@ -575,14 +669,12 @@ app.post('/saveWaitListInfo', async function (req, res) {
         return;
     }
     if (q.rowCount === 0) {
-        res.json('Invalid flightID')
-        return 
+        res.json(false)
+        return  
     } else {
-        res.json(q.rows)
-        return
+        res.json(true)
+        return 
     }
+ 
 });
 
-var server = app.listen(5000, function () {
-    console.log('Server is listening at port 5000...');
-});

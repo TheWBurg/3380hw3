@@ -320,8 +320,56 @@
             <span id="buyTicketsResults4"></span>
             <span id="buyTicketsResultsDNEonDB"></span>
             <span id="buyTicketsResults"></span>
-
         </div>
+
+        <div class="waitList">
+            <h2>Waitlist for a Flight</h2>
+            <form class="waitListInfo">
+                <div class="formBox">
+                    <label for="ssn">SSN (required)</label>
+                    <input type="text" class="ssn" placeholder="SSN" maxlength="49" required/>
+                    <span class="error_ssn"></span>
+                </div>
+                <div class="formBox">
+                    <label for="flight_id">Flight ID Number (required)</label>
+                    <input type="number" class="flight_id" placeholder="Flight ID Number" maxlength="49" required/>
+                    <span class="error_flight_id"></span>
+                </div>
+                <div class="formBox">
+                    <label for="flight_id_2">Second Flight ID Number for Connecting Flight (optional)</label>
+                    <input type="number" class="flight_id_2" placeholder="Flight ID Number" maxlength="49"/>
+                    <span class="error_flight_id_2"></span>
+                </div>
+                <div class="formBox">
+                    <label for="classType">Economy, Business, or First? (required)</label>
+                    <select class="classType">
+                        <option value="economy">Economy</option>
+                        <option value="business">Business</option>
+                        <option value="first">First Class</option>
+                    </select>
+                    <span class="error_classType"></span>
+                </div>
+                <div class="formBox">
+                    <label for="creditCardNum">Enter Credit Card Number (required)</label>
+                    <input type="text" class="creditCardNum" placeholder="Card Number"required/>
+                    <span class="error_creditCardNum"></span>
+                </div>
+                <div class="formBox">
+                    <label for="discountCode">Enter a Discount Code (optional)</label>
+                    <input type="text" class="discountCode" placeholder="Discount Code"/>
+                    <span class="error_discountCode"></span>
+                </div>
+                <div class="formBox">
+                    <label for="numBags">How Many Bags? (required)</label>
+                    <input type="number" class="numBags" placeholder="Number of Bags" min="0" required/>
+                    <span class="error_numBags"></span>
+                </div>
+            </form>
+            <div class="formBox">
+                <button id="waitListBtn" >Click to Waitlist</button>
+            </div>
+        </div>
+
         <div class="cancelTicket">
             <h2>Cancel Ticket</h2>
             <form class="cancelTicketInfo">

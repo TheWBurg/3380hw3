@@ -144,6 +144,9 @@ const searchFlight = async(ev)=>{
             if(res == 0){
                 document.getElementById('flightResults').innerText = "no flights";
             }
+            else{
+                document.getElementById('flightResults').innerText = "";
+            }
             for(let i=0; i<res.length; i++){
                 flightInfoPush += 
                 `<tr>
@@ -162,10 +165,13 @@ const searchFlight = async(ev)=>{
         try{
             let res = await getConnectedFlightDetails(flightCities);
             //editing the table in inputForm.html
-            //let flightInfo = document.querySelector("#connectedFlightInfo");
+            let connectedFlightInfo = document.querySelector("#connectedFlightInfo");
             let flightInfoPush = "";
             if(res.length == 0){
                 document.getElementById('connectedFlightResults').innerText = "No flights";
+            }
+            else{
+                document.getElementById('connectedFlightResults').innerText = "";
             }
             for(let i=0; i<res.length; i++){
                 flightInfoPush += 
@@ -448,9 +454,64 @@ const checkTicketStatus = async(ev) => {
         document.getElementById('checkStatusResults').innerText = "A ticket with this Ticket Number and SSN does not exist. \n Please try again."
     } else {
         let res = await getTicketDetails(thisTicket)
+        //
+        try{
+            //editing the table in inputForm.html
+            let flightInfoPush = "";
+            if(res == 0){
+                document.getElementById('boardingPass1').innerText = "no tickets";
+            }
+            else{
+                for(let i=0; i<res.length; i++){
+                    flightInfoPush += 
+                    `<tr>
+                    <th>${res[i].ticket_no}</th>
+                    <th>${res[i].flight_id}</th>
+                    <th>${res[i].class_type}</th>
+                    <th>${res[i].num_bags}</th>
+                    <th>${res[i].f1_sch_departure_time}</th>
+                    <th>${res[i].f1_sch_arrival_time}</th>
+                    <th>${res[i].f1_departure_airport_id}</th>
+                    <th>${res[i].f1_arrival_airport_id}</th>
+                    <th>${res[i].f1_status}</th>
+                    <th>$${res[i].final_price}</th>
+                    </tr>`;
+                }   
+                boardingPass1.innerHTML = flightInfoPush;
+    
+                //editing the table in inputForm.html
+                flightInfoPush = "";
+                if(res[0].flight_id_2 === -1){
+                    document.getElementById('boardingPass2').innerText = "no connected flight";
+                }
+                else{
+                    for(let i=0; i<res.length; i++){
+                        flightInfoPush += 
+                        `<tr>
+                        <th>${res[i].ticket_no}</th>
+                        <th>${res[i].flight_id_2}</th>
+                        <th>${res[i].class_type}</th>
+                        <th>${res[i].num_bags}</th>
+                        <th>${res[i].f2_sch_departure_time}</th>
+                        <th>${res[i].f2_sch_arrival_time}</th>
+                        <th>${res[i].f2_departure_airport_id}</th>
+                        <th>${res[i].f2_arrival_airport_id}</th>
+                        <th>${res[i].f2_status}</th>
+                        </tr>`;
+                    }   
+                    boardingPass2.innerHTML = flightInfoPush;
+                }
+                
+            }
+        }
+        catch(err){
+            console.log(err.message);
+        }
         document.getElementById('checkStatusResults').innerText = JSON.stringify(res); 
         document.querySelector('form').reset();
     }
+
+    
 }
 document.addEventListener('DOMContentLoaded', ()=>{
     document.getElementById('checkStatusBtn').addEventListener('click', checkTicketStatus);

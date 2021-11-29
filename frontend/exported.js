@@ -1,8 +1,4 @@
-<<<<<<< HEAD
-import { getDiscountInfo, saveCustomer, getFlightsDetails, getConnectedFlightDetails, saveTicketInfo, getTicketBasePrice, checkSSN, checkTicket, getTicketDetails, cancelThisTicket, getClassType, doesSsnExist, doesFlightIdExist, howManySeatsLeft} from "../test/databaseFunctions.js";
-=======
-import { getDiscountInfo, saveCustomer, getFlightsDetails, saveTicketInfo, getTicketBasePrice, checkSSN, checkTicket, getTicketDetails, cancelThisTicket, getClassType, doesSsnExist, doesFlightIdExist, howManySeatsLeft, doesFlightId2Exist} from "../test/databaseFunctions.js";
->>>>>>> Fixed frontend and backend to for buying tickets with connecting flights
+import {getDiscountInfo, saveCustomer, getFlightsDetails, getConnectedFlightDetails, saveTicketInfo, getTicketBasePrice, checkSSN, checkTicket, getTicketDetails, cancelThisTicket, getClassType, doesSsnExist, doesFlightIdExist, doesFlightId2Exist} from "../test/databaseFunctions.js";
 //import { getFlightsDetails } from "../test/databaseFunctions.js";
 //import from "../test/databaseFunctions.js";
 
@@ -114,16 +110,7 @@ const addCustomer = async (ev)=> {
 document.addEventListener('DOMContentLoaded', ()=>{
     document.getElementById('addCustomerBtn').addEventListener('click', addCustomer);
     document.querySelector('form').reset();
-});
-
-// helper funcction to put allowed missing field values into the proper form we want to insert
-// into the database. 
-function setProperNullValueIfNull(field) {
-    if (field === '') {
-        return field = 'NA'
-    }
-    return field
-}
+})
 
 
 const searchFlight = async(ev)=>{
@@ -190,8 +177,6 @@ document.addEventListener('DOMContentLoaded', ()=>{
     document.getElementById('searchFlightBtn').addEventListener('click', searchFlight);
 });
 
-<<<<<<< HEAD
-=======
 // helper funcction to put allowed missing field values into the proper form we want to insert
 // into the database. 
 function setProperNullValueIfNull(field) {
@@ -208,7 +193,6 @@ function setProperNullValueIfNullForFlightID2(field) {
     return field
 }
 
->>>>>>> Fixed frontend and backend to for buying tickets with connecting flights
 function calculateTotalFlightCost(baseTicketCost, discountAmount, discountType, classType) {
     let classCostMultiplier
     let totalFlightCost
@@ -366,22 +350,27 @@ const buyTicketInfo = async(ev)=>{
         allFullyValidedTickets = await getTotalTicketCost(allFullyValidedTickets)
         let saveTickRes = await saveTicketInfo(allFullyValidedTickets)
 
-        if(saveTickRes === 'Successfully bought tickets') {
-            for(let i = 0; i < allFullyValidedTickets.length; i++){
-                if(allFullyValidedTickets[i].flightID2 === '-1') {
-                    document.getElementById(`buyTicketsResults${i}`).innerText = 
-                    `Successfully bought a ticket for the person with SSN: ${allFullyValidedTickets[i].ssn} on flight with flightID: ${allFullyValidedTickets[i].flightID}\n`
-                } else {
-                    document.getElementById(`buyTicketsResults${i}`).innerText = 
-                    `Successfully bought a ticket for the person with SSN: ${allFullyValidedTickets[i].ssn} on flight with flightID: ${allFullyValidedTickets[i].flightID} and connecting flightID ${allFullyValidedTickets[i].flightID2}\n`
-                } 
-            }
-        } else if(saveTickRes === 'Error: Could not add valid ticket(s) to the database') {
+        if(saveTickRes === 'Error: Could not add valid ticket(s) to the database') {
             document.getElementById(`buyTicketsResults`).innerText = `Error: Could not buy tickets.\n`
-        } else if(saveTickRes === 'Error: not enough seats left') {
+        } 
+        else if(saveTickRes === 'Error: not enough seats left') {
             document.getElementById(`buyTicketsResults`).innerText = 
             `Error: Not enough seats left for the seating class for at least one of the tickets you wanted to buy.
             Either choose a different class, add yourself to the waitlist, or try again later`
+        } 
+        else if (saveTickRes.length > 0) {
+            for(let i = 0; i < allFullyValidedTickets.length; i++){
+                if(saveTickRes[i].flightid2 === '-1') {
+                    document.getElementById(`buyTicketsResults${i}`).innerText = 
+                    `Successfully bought a ticket for the person with SSN: ${saveTickRes[i].ssn} on flight with flightID: ${saveTickRes[i].flightid}
+                    The ticket number is ${saveTickRes[i].ticketno} and the final price was $${saveTickRes[i].finalprice}.\n`
+                } 
+                else {
+                    document.getElementById(`buyTicketsResults${i}`).innerText = 
+                    `Successfully bought a ticket for the person with SSN: ${saveTickRes[i].ssn} on flight with flightID: ${saveTickRes[i].flightid} and connecting flightID ${saveTickRes[i].flightid2}
+                    The ticket number is ${saveTickRes[i].ticketno} and the final price was $${saveTickRes[i].finalprice}.\n`
+                } 
+            }
         }
         //console.log(res)
     } else {

@@ -137,9 +137,11 @@ app.post('/saveTicketInfo', async function (req, res) {
     let query = `
     BEGIN TRANSACTION; 
     CREATE TEMP TABLE boughtTicks(
-        t_no int, 
-        f_price int,
-        temp_ssn int 
+        ticketNo INT, 
+        finalPrice FLOAT,
+        ssn VARCHAR(50),
+        flightID VARCHAR(50),
+        flightID2 VARCHAR(50)
     );\n`
     for(i = 0; i < t.length; i++) {
         query = query + 
@@ -151,8 +153,8 @@ app.post('/saveTicketInfo', async function (req, res) {
         INSERT INTO payment (ticket_no, ssn, credit_card_num, taxes, discount_code, final_price, flight_id, flight_id_2, is_cancelled)
         VALUES ((SELECT ticket_no FROM ins${i}), '${t[i].ssn}', '${t[i].creditCardNum}', 'NA', '${t[i].discountCode}', ${t[i].totalCost}, ${t[i].flightID}, ${t[i].flightID2}, FALSE);
 
-        INSERT INTO boughtTicks(t_no, f_price, temp_ssn)
-        values ((SELECT ticket_no FROM payment ORDER BY ticket_no DESC limit 1), ${t[i].totalCost}, ${t[i].ssn});
+        INSERT INTO boughtTicks(ticketNo, finalPrice, ssn, flightID, flightID2)
+        values ((SELECT ticket_no FROM payment ORDER BY ticket_no DESC limit 1), ${t[i].totalCost}, ${t[i].ssn}, ${t[i].flightID}, ${t[i].flightID2});
 
         UPDATE flight
         SET ${seatsLeftDict[t[i].classType]}  = (SELECT  ${seatsLeftDict[t[i].classType]} FROM flight WHERE flight_id = ${t[i].flightID}) - 1
@@ -176,10 +178,7 @@ app.post('/saveTicketInfo', async function (req, res) {
         if(err.message === `new row for relation "flight" violates check constraint "first_class_seat_left_nonnegative"`
             || err.message === `new row for relation "flight" violates check constraint "business_seat_left_nonnegative"`
             || err.message === `new row for relation "flight" violates check constraint "economy_seat_left_nonnegative"`) {
-    
-            console.log("dropped boughtTicks table")
             res.json('Error: not enough seats left')
-
             return
         }
         res.json("Error: Could not add valid ticket(s) to the database")
@@ -190,8 +189,7 @@ app.post('/saveTicketInfo', async function (req, res) {
     )
     console.log(g.rows)
     console.log("Added valid ticket(s) to the database");
-
-    res.json("Successfully bought tickets");
+    res.json(g.rows);
     return
 });
 

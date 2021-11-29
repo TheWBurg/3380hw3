@@ -155,9 +155,9 @@ const searchFlight = async(ev)=>{
                 <th>${res[i].sch_arrival_time}</th>
                 <th>${res[i].departure_airport_id}</th>
                 <th>${res[i].arrival_airport_id}</th>
-                <th>${res[i].economy_seats_left}</th>
-                <th>${res[i].business_seats_left}</th>
-                <th>${res[i].first_class_seats_left}</th>
+                <th>${res[i].economy_seat_left}</th>
+                <th>${res[i].business_seat_left}</th>
+                <th>${res[i].first_class_seat_left}</th>
                 </tr>`;
             }   
             flightInfo.innerHTML = flightInfoPush;

@@ -548,6 +548,39 @@ app.post('/doesSsnExist', async function (req, res) {
     }
 });
 
+app.post('/saveWaitListInfo', async function (req, res) {
+    console.log('Got saveWaitListInfo body:', req.body);
+    let w = req.body; 
+    let q
+
+    let seatsLeftDict = {
+        economy: "economy_seat_left",
+        business: "business_seat_left",
+        first: "first_class_seat_left"
+    }
+
+    try {
+        q = await pool.query (
+            
+            //check if there is no room on the given flight(s)
+            //if no room, add to waitlist
+
+        );
+    }
+    catch(err) {
+        console.log(err.message);
+        res.json(err.message)
+        return;
+    }
+    if (q.rowCount === 0) {
+        res.json('Invalid flightID')
+        return 
+    } else {
+        res.json(q.rows)
+        return
+    }
+});
+
 var server = app.listen(5000, function () {
     console.log('Server is listening at port 5000...');
 });

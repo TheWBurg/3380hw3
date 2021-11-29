@@ -12,8 +12,18 @@ function clearContent(){
     document.getElementById('buyTicketsResults2').innerText = ''
     document.getElementById('buyTicketsResults3').innerText = ''
     document.getElementById('buyTicketsResults4').innerText = ''
+    document.getElementById('waitListResults').innerText = ''
+    document.getElementById('waitListResults0').innerText = ''
     let elements = []
     elements = document.querySelectorAll('.buyTicketInfo')
+    elements.forEach(thisElement => {
+        thisElement.querySelectorAll(`.error_ssn`)[0].innerText = ''
+        thisElement.querySelectorAll(`.error_flight_id`)[0].innerText = ''
+        thisElement.querySelectorAll(`.error_flight_id_2`)[0].innerText = ''
+        thisElement.querySelectorAll(`.error_creditCardNum`)[0].innerText = ''
+        thisElement.querySelectorAll(`.error_numBags`)[0].innerText = ''
+    })
+    elements = document.querySelectorAll('.waitListInfo')
     elements.forEach(thisElement => {
         thisElement.querySelectorAll(`.error_ssn`)[0].innerText = ''
         thisElement.querySelectorAll(`.error_flight_id`)[0].innerText = ''
@@ -446,3 +456,138 @@ document.addEventListener('DOMContentLoaded', ()=>{
     document.getElementById('checkStatusBtn').addEventListener('click', checkTicketStatus);
 });
 
+const getWaitlistInfo = async(ev)=>{
+    ev.preventDefault();  //to stop the form submitting
+    clearContent();
+    let waitListInfo = []
+    let allValidTickets = []
+
+    // This gets all of the values entered by the user when they buy tickets
+    // it creates an array of length 5, as we ask for info for 5 tickets
+    // if the fields are left empty, it still makes a ticket in the array for it 
+    waitListInfo = document.querySelectorAll('.waitListInfo')
+
+    // this loop goes through the array of tickets and creates a new array that only contains 
+    // valid tickets. currently an invalid ticket is one that is missing values from any of the fields
+    // besides discount code
+    // TODO: add much more error checking 
+    waitListInfo.forEach( thisTicketInfo=> {
+
+        let ssn = thisTicketInfo.querySelectorAll('.ssn')[0].value
+        // checks if ssn is empty string and assign that boolean value to a variable
+        const isSsnValid = (ssn != '')
+
+        let flightID = thisTicketInfo.querySelectorAll('.flight_id')[0].value
+        const isFlightIDValid = (flightID != '')
+
+        let flightID2 = thisTicketInfo.querySelectorAll('.flight_id_2')[0].value
+        flightID2 = setProperNullValueIfNullForFlightID2(flightID2)
+
+        let classType = thisTicketInfo.querySelectorAll('.classType')[0].value.toLowerCase()
+
+        let creditCardNum = thisTicketInfo.querySelectorAll('.creditCardNum')[0].value
+        const isCreditCardNumValid = (creditCardNum != '')
+
+        let discountCode = thisTicketInfo.querySelectorAll('.discountCode')[0].value
+        discountCode = setProperNullValueIfNull(discountCode)
+
+        let numBags = thisTicketInfo.querySelectorAll('.numBags')[0].value
+        const isNumBagsValid = (numBags != '')
+
+        // If these are not all false, then we will either have an error of a valid form 
+        // If they are all false, that means the form was left blank, which is fine 
+        if(![isSsnValid, isFlightIDValid, isCreditCardNumValid, isNumBagsValid].every(val => val === false)) {
+            if([isSsnValid, isFlightIDValid, isCreditCardNumValid, isNumBagsValid].every(val => val === true)) {
+
+
+                // This means we have a valid form
+                // creates a dictionary if the ticket info is valid and pushes it to an array of valid tickets
+                const thisValidTicketInfo = {
+                    ssn: ssn,
+                    flightID: flightID,
+                    flightID2: flightID2,
+                    classType: classType,
+                    creditCardNum: creditCardNum,
+                    discountCode: discountCode,
+                    numBags: numBags
+                }
+                allValidTickets.push(thisValidTicketInfo)  
+            } 
+            if(!isSsnValid) {
+                thisTicketInfo.querySelectorAll(`.error_ssn`)[0].innerText = "SSN is required. Please fill in a value"
+            }
+            if(!isFlightIDValid) {
+                thisTicketInfo.querySelectorAll(`.error_flight_id`)[0].innerText = "Flight ID is required. Please fill in a value"
+            }
+            if(!isCreditCardNumValid) {
+                thisTicketInfo.querySelectorAll(`.error_creditCardNum`)[0].innerText = "Credit card number is required. Please fill in a value"
+            }
+            if(!isNumBagsValid) {
+                thisTicketInfo.querySelectorAll(`.error_numBags`)[0].innerText = "Number of bags is required. Please fill in a value"
+            }
+            
+        }
+    }) 
+
+
+    // removes tickets from allValidTickets that have ssn or flightid that do not exist on the databse 
+    let allFullyValidedTickets = []
+    for (let j = 0; j < allValidTickets.length; j++) {
+        let ssnExist = await doesSsnExist(allValidTickets[j])
+        let flightIdExists = await doesFlightIdExist(allValidTickets[j])
+        let flightId2Exists = await doesFlightId2Exist(allValidTickets[j])
+        /*if (!ssnExist && !flightIdExists) {
+            document.getElementById(`buyTicketsResults${j}`).innerText = `Error: The SSN ${allValidTickets[j].ssn} entered does not exist. Please register it above before buying a ticket with it.\n Error: The flightID ${allValidTickets[j].flightID } does not exist. Please choose a valid flight.\n\n`
+        } else */
+        if (!ssnExist) {
+            document.getElementById(`waitListResults${j}`).innerText = `Error: The SSN ${allValidTickets[j].ssn} does not exist. Please register it above before buying a ticket with it.\n`
+        }
+        if (!flightIdExists) {
+            document.getElementById(`waitListResults${j}`).innerText = `Error: The flightID ${allValidTickets[j].flightID} does not exist. Please choose a valid flight.\n`
+        }
+        if (!flightId2Exists) {
+            document.getElementById(`waitListResults${j}`).innerText = `Error: The connecting flightID ${allValidTickets[j].flightID2} does not exist. Please choose a valid flight.\n`
+        }   
+        if(ssnExist && flightIdExists && flightId2Exists) {
+            allFullyValidedTickets.push(allValidTickets[j])
+        }
+    }
+    console.log('length:' + allFullyValidedTickets.length)
+    if(allFullyValidedTickets.length > 0 && (allFullyValidedTickets.length === allValidTickets.length)) {
+
+        allFullyValidedTickets = await getTotalTicketCost(allFullyValidedTickets)
+        let saveWaitListInfo = await saveWaitListInfo(allFullyValidedTickets)
+
+        if(saveWaitListInfo === stuff/*general error message*/ ) {
+            document.getElementById(`waitListResults`).innerText = `Error: Could not add you to the waitlist.\n`
+        }
+        /* 
+        else if(saveTickRes === 'Error: not enough seats left') {
+            document.getElementById(`buyTicketsResults`).innerText = 
+            `Error: Not enough seats left for the seating class for at least one of the tickets you wanted to buy.
+            Either choose a different class, add yourself to the waitlist, or try again later`
+        }*/
+        else if (saveTickRes.length > 0) {
+            for(let i = 0; i < allFullyValidedTickets.length; i++){
+                if(saveTickRes[i].flightid2 === '-1') {
+                    document.getElementById(`buyTicketsResults${i}`).innerText = 
+                    `Successfully bought a ticket for the person with SSN: ${saveTickRes[i].ssn} on flight with flightID: ${saveTickRes[i].flightid}
+                    The ticket number is ${saveTickRes[i].ticketno} and the final price was $${saveTickRes[i].finalprice}.\n`
+                } 
+                else {
+                    document.getElementById(`buyTicketsResults${i}`).innerText = 
+                    `Successfully bought a ticket for the person with SSN: ${saveTickRes[i].ssn} on flight with flightID: ${saveTickRes[i].flightid} and connecting flightID ${saveTickRes[i].flightid2}
+                    The ticket number is ${saveTickRes[i].ticketno} and the final price was $${saveTickRes[i].finalprice}.\n`
+                } 
+            }
+        }
+    } else {
+        document.getElementById(`waitListResults`).innerText = `Error: Please enter valid information to get added to a waitlist\n`
+    }
+
+    document.querySelector('form').reset();
+}
+
+document.addEventListener('DOMContentLoaded', ()=>{
+    document.getElementById('waitListBtn').addEventListener('click', getWaitlistInfo);
+});

@@ -188,3 +188,14 @@ export async function howManySeatsLeft(tick) {
     return res;
 }
 
+export async function saveWaitListInfo(info) {
+    const response = await fetch(`http://localhost:5000/saveWaitListInfo`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+            },
+        body: JSON.stringify(info)});
+    let res = await response.json()
+    console.log(res)
+    return res;
+}

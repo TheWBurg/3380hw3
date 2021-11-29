@@ -134,20 +134,37 @@ app.post('/saveTicketInfo', async function (req, res) {
         first: "first_class_seat_left"
     }
 
-    let query = `BEGIN TRANSACTION;\n`
+    let query = `
+    BEGIN TRANSACTION; 
+    CREATE TEMP TABLE boughtTicks(
+        t_no int, 
+        f_price int,
+        temp_ssn int 
+    );\n`
     for(i = 0; i < t.length; i++) {
         query = query + 
         `WITH ins${i} AS (
-        INSERT INTO boarding_pass (flight_id, gate_code, class_type, num_bags)
-        VALUES (${t[i].flightID}, (SELECT departure_gate_code FROM flight WHERE flight_id = ${t[i].flightID}), '${t[i].classType}', ${t[i].numBags})
+        INSERT INTO boarding_pass (flight_id, flight_id_2, gate_code, gate_code_2, class_type, num_bags)
+        VALUES (${t[i].flightID}, ${t[i].flightID2}, (SELECT departure_gate_code FROM flight WHERE flight_id = ${t[i].flightID}), (SELECT departure_gate_code FROM flight WHERE flight_id = ${t[i].flightID2}), '${t[i].classType}', ${t[i].numBags})
         RETURNING ticket_no)
     
-        INSERT INTO payment (ticket_no, ssn, credit_card_num, taxes, discount_code, final_price, flight_id, is_cancelled)
-        VALUES ((SELECT ticket_no FROM ins${i}), '${t[i].ssn}', '${t[i].creditCardNum}', 'NA', '${t[i].discountCode}', ${t[i].totalCost}, ${t[i].flightID}, FALSE);
-        
+        INSERT INTO payment (ticket_no, ssn, credit_card_num, taxes, discount_code, final_price, flight_id, flight_id_2, is_cancelled)
+        VALUES ((SELECT ticket_no FROM ins${i}), '${t[i].ssn}', '${t[i].creditCardNum}', 'NA', '${t[i].discountCode}', ${t[i].totalCost}, ${t[i].flightID}, ${t[i].flightID2}, FALSE);
+
+        INSERT INTO boughtTicks(t_no, f_price, temp_ssn)
+        values ((SELECT ticket_no FROM payment ORDER BY ticket_no DESC limit 1), ${t[i].totalCost}, ${t[i].ssn});
+
         UPDATE flight
         SET ${seatsLeftDict[t[i].classType]}  = (SELECT  ${seatsLeftDict[t[i].classType]} FROM flight WHERE flight_id = ${t[i].flightID}) - 1
-        WHERE flight_id = ${t[i].flightID};\n`
+        WHERE flight_id = ${t[i].flightID};
+
+        UPDATE flight
+        SET ${seatsLeftDict[t[i].classType]} = 
+		  	CASE ${t[i].flightID2} 
+				WHEN -1 THEN 0 
+				ELSE (SELECT ${seatsLeftDict[t[i].classType]} FROM flight where flight_id = ${t[i].flightID2}) - 1
+			END
+		WHERE flight_id = ${t[i].flightID2};\n`
     }
     query = query + `END TRANSACTION;`
     console.log(query)
@@ -159,21 +176,29 @@ app.post('/saveTicketInfo', async function (req, res) {
         if(err.message === `new row for relation "flight" violates check constraint "first_class_seat_left_nonnegative"`
             || err.message === `new row for relation "flight" violates check constraint "business_seat_left_nonnegative"`
             || err.message === `new row for relation "flight" violates check constraint "economy_seat_left_nonnegative"`) {
+    
+            console.log("dropped boughtTicks table")
             res.json('Error: not enough seats left')
+
             return
         }
         res.json("Error: Could not add valid ticket(s) to the database")
         return
     }
-    res.json("Successfully bought tickets");
+    let g = await pool.query(
+        `SELECT * FROM boughtTicks;`
+    )
+    console.log(g.rows)
     console.log("Added valid ticket(s) to the database");
+
+    res.json("Successfully bought tickets");
     return
 });
 
 app.post('/ticketBasePrice', async function (req, res) {
     console.log('Got ticketBasePrice body:', req.body);
     let f = req.body; 
-    let q
+    let q, p
 
     try {
         q = await pool.query (
@@ -181,20 +206,29 @@ app.post('/ticketBasePrice', async function (req, res) {
             FROM flight
             WHERE flight_id = ${f.flightID};`
         );
+        p = await pool.query (
+            `SELECT base_ticket_cost 
+            FROM flight
+            WHERE flight_id = ${f.flightID2};`
+        );
     }
     catch(err) {
         console.log(err.message);
         res.json(err.message)
         return; 
     }
-    console.log(q.rows);
+    let basePrice = q.rows[0].base_ticket_cost + p.rows[0].base_ticket_cost;
+    console.log(basePrice);
+    console.log(q.rows[0].base_ticket_cost)
 
     // send stuff back to frontend
-    res.json(q.rows);
+    res.json(basePrice);
     //res.sendStatus(200);
     console.log("Got flight_id base cost");
     return; 
 });
+
+
 
 app.post('/discountInfo', async function (req, res) {
     console.log('Got discountInfo body:', req.body);
@@ -401,6 +435,34 @@ app.post('/doesFlightIdExist', async function (req, res) {
             `SELECT *
             FROM flight
             WHERE flight_id = '${f.flightID}';`
+        );
+    }
+    catch(err) {
+        console.log(err.message);
+        res.json(err.message)
+        return;
+    }
+    if (q.rowCount === 0) {
+        res.json(false)
+        return 
+    } else {
+        res.json(true)
+        return
+    }
+});
+app.post('/doesFlightId2Exist', async function (req, res) {
+    console.log('Got doesFlightId2Exist body:', req.body);
+    let f = req.body; 
+    let q
+    if(f.flightID2 === -1) {
+        res.json(true)
+        return
+    }
+    try {
+        q = await pool.query (
+            `SELECT *
+            FROM flight
+            WHERE flight_id = '${f.flightID2}';`
         );
     }
     catch(err) {

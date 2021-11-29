@@ -1,6 +1,10 @@
+<<<<<<< HEAD
 import { getDiscountInfo, saveCustomer, getFlightsDetails, getConnectedFlightDetails, saveTicketInfo, getTicketBasePrice, checkSSN, checkTicket, getTicketDetails, cancelThisTicket, getClassType, doesSsnExist, doesFlightIdExist, howManySeatsLeft} from "../test/databaseFunctions.js";
+=======
+import { getDiscountInfo, saveCustomer, getFlightsDetails, saveTicketInfo, getTicketBasePrice, checkSSN, checkTicket, getTicketDetails, cancelThisTicket, getClassType, doesSsnExist, doesFlightIdExist, howManySeatsLeft, doesFlightId2Exist} from "../test/databaseFunctions.js";
+>>>>>>> Fixed frontend and backend to for buying tickets with connecting flights
 //import { getFlightsDetails } from "../test/databaseFunctions.js";
-//import "../test/databaseFunctions.js";
+//import from "../test/databaseFunctions.js";
 
 
 
@@ -17,6 +21,7 @@ function clearContent(){
     elements.forEach(thisElement => {
         thisElement.querySelectorAll(`.error_ssn`)[0].innerText = ''
         thisElement.querySelectorAll(`.error_flight_id`)[0].innerText = ''
+        thisElement.querySelectorAll(`.error_flight_id_2`)[0].innerText = ''
         thisElement.querySelectorAll(`.error_creditCardNum`)[0].innerText = ''
         thisElement.querySelectorAll(`.error_numBags`)[0].innerText = ''
     })
@@ -185,6 +190,25 @@ document.addEventListener('DOMContentLoaded', ()=>{
     document.getElementById('searchFlightBtn').addEventListener('click', searchFlight);
 });
 
+<<<<<<< HEAD
+=======
+// helper funcction to put allowed missing field values into the proper form we want to insert
+// into the database. 
+function setProperNullValueIfNull(field) {
+    if (field === '') {
+        return field = 'NA'
+    }
+    return field
+}
+
+function setProperNullValueIfNullForFlightID2(field) {
+    if (field === '') {
+        return field = '-1'
+    }
+    return field
+}
+
+>>>>>>> Fixed frontend and backend to for buying tickets with connecting flights
 function calculateTotalFlightCost(baseTicketCost, discountAmount, discountType, classType) {
     let classCostMultiplier
     let totalFlightCost
@@ -211,8 +235,8 @@ function calculateTotalFlightCost(baseTicketCost, discountAmount, discountType, 
 
 async function getTotalTicketCost(allValidTicketsArray) {
     for(const thisTicket of allValidTicketsArray) {
-        let res = await getTicketBasePrice(thisTicket)
-        let ticketBasePrice = res[0].base_ticket_cost
+        let ticketBasePrice = await getTicketBasePrice(thisTicket)
+        //let ticketBasePrice = res[0].base_ticket_cost
         //console.log(ticketBasePrice)
 
         let discountInfo = await getDiscountInfo(thisTicket)
@@ -253,6 +277,9 @@ const buyTicketInfo = async(ev)=>{
         let flightID = thisTicketInfo.querySelectorAll('.flight_id')[0].value
         const isFlightIDValid = (flightID != '')
 
+        let flightID2 = thisTicketInfo.querySelectorAll('.flight_id_2')[0].value
+        flightID2 = setProperNullValueIfNullForFlightID2(flightID2)
+
         let classType = thisTicketInfo.querySelectorAll('.classType')[0].value.toLowerCase()
 
         let creditCardNum = thisTicketInfo.querySelectorAll('.creditCardNum')[0].value
@@ -275,6 +302,7 @@ const buyTicketInfo = async(ev)=>{
                 const thisValidTicketInfo = {
                     ssn: ssn,
                     flightID: flightID,
+                    flightID2: flightID2,
                     classType: classType,
                     creditCardNum: creditCardNum,
                     discountCode: discountCode,
@@ -304,19 +332,26 @@ const buyTicketInfo = async(ev)=>{
     for (let j = 0; j < allValidTickets.length; j++) {
         let ssnExist = await doesSsnExist(allValidTickets[j])
         let flightIdExists = await doesFlightIdExist(allValidTickets[j])
-        if (!ssnExist && !flightIdExists) {
+        let flightId2Exists = await doesFlightId2Exist(allValidTickets[j])
+        /*if (!ssnExist && !flightIdExists) {
             document.getElementById(`buyTicketsResults${j}`).innerText = `Error: The SSN ${allValidTickets[j].ssn} entered does not exist. Please register it above before buying a ticket with it.\n Error: The flightID ${allValidTickets[j].flightID } does not exist. Please choose a valid flight.\n\n`
-        } else if (!ssnExist) {
-            document.getElementById(`buyTicketsResults${j}`).innerText = `Error: The SSN ${allValidTickets[j].ssn} does not exist. Please register it above before buying a ticket with it.\n\n`
-        } else if (!flightIdExists) {
-            document.getElementById(`buyTicketsResults${j}`).innerText = `Error: The flightID ${allValidTickets[j].flightID} does not exist. Please choose a valid flight.\n\n`
+        } else */
+        if (!ssnExist) {
+            document.getElementById(`buyTicketsResults${j}`).innerText = `Error: The SSN ${allValidTickets[j].ssn} does not exist. Please register it above before buying a ticket with it.\n`
+        }
+        if (!flightIdExists) {
+            document.getElementById(`buyTicketsResults${j}`).innerText = `Error: The flightID ${allValidTickets[j].flightID} does not exist. Please choose a valid flight.\n`
+        }
+        if (!flightId2Exists) {
+            document.getElementById(`buyTicketsResults${j}`).innerText = `Error: The connecting flightID ${allValidTickets[j].flightID2} does not exist. Please choose a valid flight.\n`
+        
         } else {
-            let seatsLeft = await howManySeatsLeft(allValidTickets[j])
+            /*let seatsLeft = await howManySeatsLeft(allValidTickets[j])
             if (seatsLeft === 0) {
                 // figure this part out. difficult for the case where this is enough seats for 1 ticket but not for the whole order
-            }  
+            }*/  
         }
-        if(ssnExist && flightIdExists) {
+        if(ssnExist && flightIdExists && flightId2Exists) {
             //let index = allValidTickets.indexOf(ticket)
             allFullyValidedTickets.push(allValidTickets[j])
         }
@@ -333,9 +368,13 @@ const buyTicketInfo = async(ev)=>{
 
         if(saveTickRes === 'Successfully bought tickets') {
             for(let i = 0; i < allFullyValidedTickets.length; i++){
-
-                document.getElementById(`buyTicketsResults${i}`).innerText = 
-                `Successfully bought a ticket for the person with SSN: ${allFullyValidedTickets[i].ssn} on flight with flightID: ${allFullyValidedTickets[i].flightID}\n`
+                if(allFullyValidedTickets[i].flightID2 === '-1') {
+                    document.getElementById(`buyTicketsResults${i}`).innerText = 
+                    `Successfully bought a ticket for the person with SSN: ${allFullyValidedTickets[i].ssn} on flight with flightID: ${allFullyValidedTickets[i].flightID}\n`
+                } else {
+                    document.getElementById(`buyTicketsResults${i}`).innerText = 
+                    `Successfully bought a ticket for the person with SSN: ${allFullyValidedTickets[i].ssn} on flight with flightID: ${allFullyValidedTickets[i].flightID} and connecting flightID ${allFullyValidedTickets[i].flightID2}\n`
+                } 
             }
         } else if(saveTickRes === 'Error: Could not add valid ticket(s) to the database') {
             document.getElementById(`buyTicketsResults`).innerText = `Error: Could not buy tickets.\n`

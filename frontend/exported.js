@@ -155,6 +155,9 @@ const searchFlight = async(ev)=>{
                 <th>${res[i].sch_arrival_time}</th>
                 <th>${res[i].departure_airport_id}</th>
                 <th>${res[i].arrival_airport_id}</th>
+                <th>${res[i].economy_seats_left}</th>
+                <th>${res[i].business_seats_left}</th>
+                <th>${res[i].first_class_seats_left}</th>
                 </tr>`;
             }   
             flightInfo.innerHTML = flightInfoPush;
@@ -185,6 +188,9 @@ const searchFlight = async(ev)=>{
                 <th>${res[i].layover_arrival_time}</th>
                 <th>${res[i].layover_departure_time}</th>
                 <th>${res[i].destination_arrival_time}</th>
+                <th>${res[i].t1_econ}-${res[i].t2_econ}</th>
+                <th>${res[i].t1_bus}-${res[i].t2_bus}</th>
+                <th>${res[i].t1_first}-${res[i].t2_first}</th>
                 </tr>`;
             }   
             connectedFlightInfo.innerHTML = flightInfoPush;
@@ -462,6 +468,9 @@ const checkTicketStatus = async(ev) => {
             let flightInfoPush = "";
             if(res == 0){
                 document.getElementById('boardingPass1').innerText = "no tickets";
+            }
+            else if(res[0].is_cancelled === true){
+                document.getElementById('boardingPass1').innerText = "cancelled";
             }
             else{
                 for(let i=0; i<res.length; i++){

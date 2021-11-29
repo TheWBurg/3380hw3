@@ -199,3 +199,27 @@ export async function saveWaitListInfo(info) {
     console.log(res)
     return res;
 }
+
+export async function getWaitListPosition(info) {
+    const response = await fetch(`http://localhost:5000/getWaitListPosition`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+            },
+        body: JSON.stringify(info)});
+    let res = await response.json()
+    console.log(res)
+    return res;
+}
+
+export async function doesDiscountCodeExist(code) {
+    const response = await fetch(`http://localhost:5000/doesDiscountCodeExist`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+            },
+        body: JSON.stringify(code)});
+    let res = await response.json()
+    console.log(res)
+    return res;
+}

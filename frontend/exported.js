@@ -1,4 +1,4 @@
-import {getDiscountInfo, saveCustomer, getFlightsDetails, getConnectedFlightDetails, saveTicketInfo, getTicketBasePrice, checkSSN, checkTicket, getTicketDetails, cancelThisTicket, getClassType, doesSsnExist, doesFlightIdExist, doesFlightId2Exist} from "../test/databaseFunctions.js";
+import {getDiscountInfo, saveCustomer, getFlightsDetails, getConnectedFlightDetails, saveTicketInfo, getTicketBasePrice, checkSSN, checkTicket, getTicketDetails, cancelThisTicket, getClassType, doesSsnExist, doesFlightIdExist, doesFlightId2Exist, saveWaitListInfo, getWaitListPosition, doesDiscountCodeExist} from "../test/databaseFunctions.js";
 //import { getFlightsDetails } from "../test/databaseFunctions.js";
 //import from "../test/databaseFunctions.js";
 
@@ -284,6 +284,7 @@ const buyTicketInfo = async(ev)=>{
         const isFlightIDValid = (flightID != '')
 
         let flightID2 = thisTicketInfo.querySelectorAll('.flight_id_2')[0].value
+        const isFlightID2Valid = (flightID != flightID2)
         flightID2 = setProperNullValueIfNullForFlightID2(flightID2)
 
         let classType = thisTicketInfo.querySelectorAll('.classType')[0].value.toLowerCase()
@@ -300,7 +301,7 @@ const buyTicketInfo = async(ev)=>{
         // If these are not all false, then we will either have an error of a valid form 
         // If they are all false, that means the form was left blank, which is fine 
         if(![isSsnValid, isFlightIDValid, isCreditCardNumValid, isNumBagsValid].every(val => val === false)) {
-            if([isSsnValid, isFlightIDValid, isCreditCardNumValid, isNumBagsValid].every(val => val === true)) {
+            if([isSsnValid, isFlightIDValid, isFlightID2Valid, isCreditCardNumValid, isNumBagsValid].every(val => val === true)) {
 
 
                 // This means we have a valid form
@@ -322,6 +323,9 @@ const buyTicketInfo = async(ev)=>{
             if(!isFlightIDValid) {
                 thisTicketInfo.querySelectorAll(`.error_flight_id`)[0].innerText = "Flight ID is required. Please fill in a value"
             }
+            if(!isFlightID2Valid) {
+                thisTicketInfo.querySelectorAll(`.error_flight_id_2`)[0].innerText = "The second flight ID cannot be the same as the first flight ID"
+            }
             if(!isCreditCardNumValid) {
                 thisTicketInfo.querySelectorAll(`.error_creditCardNum`)[0].innerText = "Credit card number is required. Please fill in a value"
             }
@@ -339,6 +343,7 @@ const buyTicketInfo = async(ev)=>{
         let ssnExist = await doesSsnExist(allValidTickets[j])
         let flightIdExists = await doesFlightIdExist(allValidTickets[j])
         let flightId2Exists = await doesFlightId2Exist(allValidTickets[j])
+        let discountCodeExists = await doesDiscountCodeExist(allValidTickets[j])
         /*if (!ssnExist && !flightIdExists) {
             document.getElementById(`buyTicketsResults${j}`).innerText = `Error: The SSN ${allValidTickets[j].ssn} entered does not exist. Please register it above before buying a ticket with it.\n Error: The flightID ${allValidTickets[j].flightID } does not exist. Please choose a valid flight.\n\n`
         } else */
@@ -350,14 +355,11 @@ const buyTicketInfo = async(ev)=>{
         }
         if (!flightId2Exists) {
             document.getElementById(`buyTicketsResults${j}`).innerText = `Error: The connecting flightID ${allValidTickets[j].flightID2} does not exist. Please choose a valid flight.\n`
-        
-        } else {
-            /*let seatsLeft = await howManySeatsLeft(allValidTickets[j])
-            if (seatsLeft === 0) {
-                // figure this part out. difficult for the case where this is enough seats for 1 ticket but not for the whole order
-            }*/  
+        } 
+        if (!discountCodeExists) {
+            document.getElementById(`buyTicketsResults${j}`).innerText = `Error: The discount code ${allValidTickets[j].discountCode} does not exist. Please choose a valid discount code or leave the discount code field blank.`
         }
-        if(ssnExist && flightIdExists && flightId2Exists) {
+        if(ssnExist && flightIdExists && flightId2Exists && discountCodeExists) {
             //let index = allValidTickets.indexOf(ticket)
             allFullyValidedTickets.push(allValidTickets[j])
         }
@@ -542,6 +544,7 @@ const getWaitlistInfo = async(ev)=>{
         const isFlightIDValid = (flightID != '')
 
         let flightID2 = thisTicketInfo.querySelectorAll('.flight_id_2')[0].value
+        const isFlightID2Valid = (flightID != flightID2)
         flightID2 = setProperNullValueIfNullForFlightID2(flightID2)
 
         let classType = thisTicketInfo.querySelectorAll('.classType')[0].value.toLowerCase()
@@ -558,7 +561,7 @@ const getWaitlistInfo = async(ev)=>{
         // If these are not all false, then we will either have an error of a valid form 
         // If they are all false, that means the form was left blank, which is fine 
         if(![isSsnValid, isFlightIDValid, isCreditCardNumValid, isNumBagsValid].every(val => val === false)) {
-            if([isSsnValid, isFlightIDValid, isCreditCardNumValid, isNumBagsValid].every(val => val === true)) {
+            if([isSsnValid, isFlightIDValid, isFlightID2Valid, isCreditCardNumValid, isNumBagsValid].every(val => val === true)) {
 
 
                 // This means we have a valid form
@@ -580,11 +583,17 @@ const getWaitlistInfo = async(ev)=>{
             if(!isFlightIDValid) {
                 thisTicketInfo.querySelectorAll(`.error_flight_id`)[0].innerText = "Flight ID is required. Please fill in a value"
             }
+            if(!isFlightID2Valid) {
+                thisTicketInfo.querySelectorAll(`.error_flight_id_2`)[0].innerText = "The second flight ID cannot be the same as the first flight ID"
+            }
             if(!isCreditCardNumValid) {
                 thisTicketInfo.querySelectorAll(`.error_creditCardNum`)[0].innerText = "Credit card number is required. Please fill in a value"
             }
             if(!isNumBagsValid) {
                 thisTicketInfo.querySelectorAll(`.error_numBags`)[0].innerText = "Number of bags is required. Please fill in a value"
+            }
+            if(!isFlightID2Valid) {
+                thisTicketInfo.querySelectorAll(`.error_flight_id_2`)[0].innerText = "The second flight ID cannot be the same as the first flight ID"
             }
             
         }
@@ -597,9 +606,8 @@ const getWaitlistInfo = async(ev)=>{
         let ssnExist = await doesSsnExist(allValidTickets[j])
         let flightIdExists = await doesFlightIdExist(allValidTickets[j])
         let flightId2Exists = await doesFlightId2Exist(allValidTickets[j])
-        /*if (!ssnExist && !flightIdExists) {
-            document.getElementById(`buyTicketsResults${j}`).innerText = `Error: The SSN ${allValidTickets[j].ssn} entered does not exist. Please register it above before buying a ticket with it.\n Error: The flightID ${allValidTickets[j].flightID } does not exist. Please choose a valid flight.\n\n`
-        } else */
+        let discountCodeExists = await doesDiscountCodeExist(allValidTickets[j])
+
         if (!ssnExist) {
             document.getElementById(`waitListResults${j}`).innerText = `Error: The SSN ${allValidTickets[j].ssn} does not exist. Please register it above before buying a ticket with it.\n`
         }
@@ -609,7 +617,10 @@ const getWaitlistInfo = async(ev)=>{
         if (!flightId2Exists) {
             document.getElementById(`waitListResults${j}`).innerText = `Error: The connecting flightID ${allValidTickets[j].flightID2} does not exist. Please choose a valid flight.\n`
         }   
-        if(ssnExist && flightIdExists && flightId2Exists) {
+        if (!discountCodeExists) {
+            document.getElementById(`buyTicketsResults${j}`).innerText = `Error: The discount code ${allValidTickets[j].discountCode} does not exist. Please choose a valid discount code or leave the discount code field blank.\n`
+        }
+        if(ssnExist && flightIdExists && flightId2Exists && discountCodeExists) {
             allFullyValidedTickets.push(allValidTickets[j])
         }
     }
@@ -617,9 +628,10 @@ const getWaitlistInfo = async(ev)=>{
     if(allFullyValidedTickets.length > 0 && (allFullyValidedTickets.length === allValidTickets.length)) {
 
         allFullyValidedTickets = await getTotalTicketCost(allFullyValidedTickets)
-        let saveWaitListInfo = await saveWaitListInfo(allFullyValidedTickets)
+        let saveWaitListRes = await saveWaitListInfo(allFullyValidedTickets)
+        let waitListPositionRes = await getWaitListPosition(saveWaitListRes)
 
-        if(saveWaitListInfo === stuff/*general error message*/ ) {
+        if(saveWaitListRes === "Error adding to waitlist" ) {
             document.getElementById(`waitListResults`).innerText = `Error: Could not add you to the waitlist.\n`
         }
         /* 
@@ -628,17 +640,17 @@ const getWaitlistInfo = async(ev)=>{
             `Error: Not enough seats left for the seating class for at least one of the tickets you wanted to buy.
             Either choose a different class, add yourself to the waitlist, or try again later`
         }*/
-        else if (saveTickRes.length > 0) {
+        else if (saveWaitListRes.length > 0) {
             for(let i = 0; i < allFullyValidedTickets.length; i++){
-                if(saveTickRes[i].flightid2 === '-1') {
-                    document.getElementById(`buyTicketsResults${i}`).innerText = 
-                    `Successfully bought a ticket for the person with SSN: ${saveTickRes[i].ssn} on flight with flightID: ${saveTickRes[i].flightid}
-                    The ticket number is ${saveTickRes[i].ticketno} and the final price was $${saveTickRes[i].finalprice}.\n`
+                if(saveWaitListRes[i].flightid2 === '-1') {
+                    document.getElementById(`waitListResults${i}`).innerText = 
+                    `Successfully added the person with SSN: ${saveWaitListRes[i].ssn} to the waitlist for flight with flightID: ${saveWaitListRes[i].flightid}
+                    Your waitlist number ID ${saveWaitListRes[i].waitlist_id} and your position on the waitlist is ${waitListPositionRes}.\n`
                 } 
                 else {
-                    document.getElementById(`buyTicketsResults${i}`).innerText = 
-                    `Successfully bought a ticket for the person with SSN: ${saveTickRes[i].ssn} on flight with flightID: ${saveTickRes[i].flightid} and connecting flightID ${saveTickRes[i].flightid2}
-                    The ticket number is ${saveTickRes[i].ticketno} and the final price was $${saveTickRes[i].finalprice}.\n`
+                    document.getElementById(`waitListResults${i}`).innerText = 
+                    `Successfully the person with SSN: ${saveWaitListRes[i].ssn} to the waitlist for flight with flightID: ${saveWaitListRes[i].flightid} and connecting flightID ${saveWaitListRes[i].flightid2}
+                    Your waitlist number ID ${saveWaitListRes[i].waitlist_id} and your position on the waitlist is ${waitListPositionRes}.\n`
                 } 
             }
         }

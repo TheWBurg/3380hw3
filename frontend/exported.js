@@ -105,7 +105,11 @@ const addCustomer = async (ev)=> {
         document.getElementById('resgiterCustomerResults').innerText = "SSN, First Name, and Last Name fields are required. \n Please try again."
     } else if(doesSsnExist === true) {
         document.getElementById('resgiterCustomerResults').innerText = "ERROR: This SSN is already registered. Please try a different SSN"
-    } else {
+    }else if(!(validateName(thisCustomer.first_name) && validateName(thisCustomer.last_name))){
+        document.getElementById('resgiterCustomerResults').innerText = "ERROR: Name cannot have spaces or numbers"
+    }else if(!(validateNumber(thisCustomer.phone_num) && validateNumber(thisCustomer.phone_num))){
+        document.getElementById('resgiterCustomerResults').innerText = "ERROR: Phone number cannot have letters"
+    }else {
         let res = await saveCustomer(thisCustomer);
         document.getElementById('resgiterCustomerResults').innerText = "Successfully registered this user!"
         console.log(res);
@@ -122,6 +126,26 @@ document.addEventListener('DOMContentLoaded', ()=>{
     document.querySelector('form').reset();
 })
 
+function validateName(name){
+    let letters = /^[A-Za-z]+$/;
+    
+    if (name.match(letters)){
+        return true
+    }
+    else{
+        return false
+    }
+}
+
+function validateNumber(number){
+    let numbers = /^[0-9]+$/;
+    if (number.match(numbers)){
+        return true
+    }
+    else{
+        return false
+    }
+}
 
 const searchFlight = async(ev)=>{
     ev.preventDefault();  //to stop the form submitting

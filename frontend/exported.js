@@ -645,7 +645,10 @@ const getWaitlistInfo = async(ev)=>{
         let flightIdExists = await doesFlightIdExist(allValidTickets[j])
         let flightId2Exists = await doesFlightId2Exist(allValidTickets[j])
         let discountCodeExists = await doesDiscountCodeExist(allValidTickets[j])
-        let isValidConnectingFlight = await doesConnectingFlightExist(allValidTickets[j])
+        let isValidConnectingFlight = true
+        if (allValidTickets[j].flightID2 != '-1') {
+            isValidConnectingFlight = await doesConnectingFlightExist(allValidTickets[j])
+        } 
 
         if (!ssnExist) {
             document.getElementById(`waitListResults${j}`).innerText = `Error: The SSN ${allValidTickets[j].ssn} does not exist. Please register it above before buying a ticket with it.\n`

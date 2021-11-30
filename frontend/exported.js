@@ -350,7 +350,10 @@ const buyTicketInfo = async(ev)=>{
         let flightIdExists = await doesFlightIdExist(allValidTickets[j])
         let flightId2Exists = await doesFlightId2Exist(allValidTickets[j])
         let discountCodeExists = await doesDiscountCodeExist(allValidTickets[j])
-        let isValidConnectingFlight = await doesConnectingFlightExist(allValidTickets[j])
+        let isValidConnectingFlight = true
+        if (allValidTickets[j].flightID2 != '-1') {
+            isValidConnectingFlight = await doesConnectingFlightExist(allValidTickets[j])
+        } 
 
         if (!ssnExist) {
             document.getElementById(`buyTicketsResults${j}`).innerText = `Error: The SSN ${allValidTickets[j].ssn} does not exist. Please register it above before buying a ticket with it.\n`
@@ -375,7 +378,8 @@ const buyTicketInfo = async(ev)=>{
     // using the valid ticket information, this queries the database for the base ticket cost,
     // discount codes, and calculates the final cost.
     // It then displays which tickets were sucessfully bought
-    console.log('length:' + allFullyValidedTickets.length)
+    
+    //console.log('length:' + allFullyValidedTickets.length)
     if(allFullyValidedTickets.length > 0 && (allFullyValidedTickets.length === allValidTickets.length)) {
 
         allFullyValidedTickets = await getTotalTicketCost(allFullyValidedTickets)

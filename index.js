@@ -148,8 +148,8 @@ app.post('/saveTicketInfo', async function (req, res) {
     for(i = 0; i < t.length; i++) {
         query = query + 
         `WITH ins${i} AS (
-        INSERT INTO boarding_pass (flight_id, flight_id_2, gate_code, gate_code_2, class_type, num_bags, is_waitlisted)
-        VALUES (${t[i].flightID}, ${t[i].flightID2}, (SELECT departure_gate_code FROM flight WHERE flight_id = ${t[i].flightID}), (SELECT departure_gate_code FROM flight WHERE flight_id = ${t[i].flightID2}), '${t[i].classType}', ${t[i].numBags}, 'FALSE')
+        INSERT INTO boarding_pass (flight_id, flight_id_2, class_type, num_bags, is_waitlisted)
+        VALUES (${t[i].flightID}, ${t[i].flightID2}, '${t[i].classType}', ${t[i].numBags}, 'FALSE')
         RETURNING ticket_no)
     
         INSERT INTO payment (ticket_no, ssn, credit_card_num, taxes, discount_code, final_price, flight_id, flight_id_2, is_cancelled)
@@ -590,8 +590,8 @@ app.post('/saveWaitListInfo', async function (req, res) {
                 );
                 
                 WITH ins0 AS (
-                INSERT INTO boarding_pass (flight_id, flight_id_2, gate_code, gate_code_2, class_type, num_bags, is_waitlisted)
-                VALUES (${w.flightID}, ${w.flightID2}, (SELECT departure_gate_code FROM flight WHERE flight_id = ${w.flightID}), (SELECT departure_gate_code FROM flight WHERE flight_id = ${w.flightID2}), '${w.classType}', ${w.numBags}, 'TRUE')
+                INSERT INTO boarding_pass (flight_id, flight_id_2, class_type, num_bags, is_waitlisted)
+                VALUES (${w.flightID}, ${w.flightID2}, '${w.classType}', ${w.numBags}, 'TRUE')
                 RETURNING ticket_no)
             
                 INSERT INTO payment (ticket_no, ssn, credit_card_num, taxes, discount_code, final_price, flight_id, flight_id_2, is_cancelled)

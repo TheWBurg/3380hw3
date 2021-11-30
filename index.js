@@ -577,8 +577,7 @@ app.post('/saveWaitListInfo', async function (req, res) {
         res.json(err.message)
         return;
     }
-
-    if (q.rowCount > 0) {
+    if (q.rowCount === 0) {
         try {
             r = await pool.query (
                 `BEGIN TRANSACTION; 
@@ -606,7 +605,6 @@ app.post('/saveWaitListInfo', async function (req, res) {
                     
                 END TRANSACTION;
             `)
-            
         } catch(err) {
             console.log(err.message);
             res.json("Error adding to waitlist")
@@ -624,10 +622,6 @@ app.post('/saveWaitListInfo', async function (req, res) {
     }
 });
 
-var server = app.listen(5000, function () {
-    console.log('Server is listening at port 5000...');
-});
-
 app.post('/getWaitListPosition', async function (req, res) {
     console.log('Got getWaitListPosition body:', req.body);
     let p = req.body[0]; 
@@ -637,7 +631,7 @@ app.post('/getWaitListPosition', async function (req, res) {
         q = await pool.query (
             `SELECT position
             FROM waitlist
-            WHERE position <= '${p.position}' AND is_waitlisted = 'TRUE'
+            WHERE position <= ${p.position} AND is_waitlisted = 'TRUE'
             ORDER BY position ASC;`
         );
     }
@@ -675,6 +669,72 @@ app.post('/doesDiscountCodeExist', async function (req, res) {
         res.json(true)
         return 
     }
- 
 });
 
+app.post('/doesConnectingFlightExist', async function (req, res) {
+    console.log('Got doesConnectingFlightExist body:', req.body);
+    let f = req.body; 
+    let q, r, s
+
+    try {
+        r = await pool.query (
+            `SELECT airport_city
+            FROM airport 
+            WHERE airport_id = (SELECT departure_airport_id FROM flight WHERE flight_id = ${f.flightID})`
+        )
+    }
+    catch(err) {
+        console.log(err.message);
+        res.json(err.message)
+        return;
+    }
+    try {
+        s = await pool.query (
+            `SELECT airport_city
+            FROM airport 
+            WHERE airport_id = (SELECT arrival_airport_id FROM flight WHERE flight_id = ${f.flightID2})`
+        )
+    }
+    catch(err) {
+        console.log(err.message);
+        res.json(err.message)
+        return;
+    }
+
+    try {
+        q = await pool.query (
+            `SELECT t1.flight_id AS flight_id1, t2.flight_id AS flight_id2, t1.departure_airport_id, t1.arrival_airport_id AS layover_airport_id, t2.arrival_airport_id AS destination_airport_id, 
+            t1.sch_departure_time, t1.sch_arrival_time AS layover_arrival_time, t2.sch_departure_time AS layover_departure_time, t2.sch_arrival_time AS destination_arrival_time,
+            t1.economy_seat_left AS t1_econ, t2.economy_seat_left AS t2_econ, t1.business_seat_left AS t1_bus, t2.business_seat_left AS t2_bus, t1.first_class_seat_left AS t1_first, 
+            t2.first_class_seat_left AS t2_first
+
+            FROM flight AS t1
+
+            INNER JOIN flight AS t2 ON t2.departure_airport_id = t1.arrival_airport_id
+
+            WHERE t1.departure_airport_id = (SELECT airport_id FROM airport WHERE airport_city = '${r.rows[0].airport_city}')
+            AND
+            t2.arrival_airport_id = (SELECT airport_id FROM airport WHERE airport_city = '${s.rows[0].airport_city}')
+            AND 
+            t1.sch_arrival_time < t2.sch_departure_time
+            AND t1.flight_id = ${f.flightID} AND t2.flight_id = ${f.flightID2};`
+        );
+    }
+    catch(err) {
+        console.log(err.message);
+        res.json(err.message)
+        return;
+    }
+    console.log(q.rows)
+    if (q.rowCount === 0) {
+        res.json(false)
+        return  
+    } else {
+        res.json(true)
+        return 
+    }
+});
+
+var server = app.listen(5000, function () {
+    console.log('Server is listening at port 5000...');
+});

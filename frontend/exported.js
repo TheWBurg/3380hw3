@@ -1,4 +1,4 @@
-import {getDiscountInfo, saveCustomer, getFlightsDetails, getConnectedFlightDetails, saveTicketInfo, getTicketBasePrice, checkSSN, checkTicket, getTicketDetails, cancelThisTicket, getClassType, doesSsnExist, doesFlightIdExist, doesFlightId2Exist, saveWaitListInfo, getWaitListPosition, doesDiscountCodeExist} from "../test/databaseFunctions.js";
+import {getDiscountInfo, saveCustomer, getFlightsDetails, getConnectedFlightDetails, saveTicketInfo, getTicketBasePrice, checkSSN, checkTicket, getTicketDetails, cancelThisTicket, getClassType, doesSsnExist, doesFlightIdExist, doesFlightId2Exist, saveWaitListInfo, getWaitListPosition, doesDiscountCodeExist, doesConnectingFlightExist} from "../test/databaseFunctions.js";
 //import { getFlightsDetails } from "../test/databaseFunctions.js";
 //import from "../test/databaseFunctions.js";
 
@@ -350,9 +350,8 @@ const buyTicketInfo = async(ev)=>{
         let flightIdExists = await doesFlightIdExist(allValidTickets[j])
         let flightId2Exists = await doesFlightId2Exist(allValidTickets[j])
         let discountCodeExists = await doesDiscountCodeExist(allValidTickets[j])
-        /*if (!ssnExist && !flightIdExists) {
-            document.getElementById(`buyTicketsResults${j}`).innerText = `Error: The SSN ${allValidTickets[j].ssn} entered does not exist. Please register it above before buying a ticket with it.\n Error: The flightID ${allValidTickets[j].flightID } does not exist. Please choose a valid flight.\n\n`
-        } else */
+        let isValidConnectingFlight = await doesConnectingFlightExist(allValidTickets[j])
+
         if (!ssnExist) {
             document.getElementById(`buyTicketsResults${j}`).innerText = `Error: The SSN ${allValidTickets[j].ssn} does not exist. Please register it above before buying a ticket with it.\n`
         }
@@ -362,11 +361,13 @@ const buyTicketInfo = async(ev)=>{
         if (!flightId2Exists) {
             document.getElementById(`buyTicketsResults${j}`).innerText = `Error: The connecting flightID ${allValidTickets[j].flightID2} does not exist. Please choose a valid flight.\n`
         } 
+        if (!isValidConnectingFlight) {
+            document.getElementById(`buyTicketsResults${j}`).innerText = `Error: The connecting flightID ${allValidTickets[j].flightID2} does not exist. Please choose a valid flight.\n`
+        } 
         if (!discountCodeExists) {
             document.getElementById(`buyTicketsResults${j}`).innerText = `Error: The discount code ${allValidTickets[j].discountCode} does not exist. Please choose a valid discount code or leave the discount code field blank.`
         }
-        if(ssnExist && flightIdExists && flightId2Exists && discountCodeExists) {
-            //let index = allValidTickets.indexOf(ticket)
+        if(ssnExist && flightIdExists && flightId2Exists && isValidConnectingFlight && discountCodeExists) {
             allFullyValidedTickets.push(allValidTickets[j])
         }
     }
@@ -386,7 +387,7 @@ const buyTicketInfo = async(ev)=>{
         else if(saveTickRes === 'Error: not enough seats left') {
             document.getElementById(`buyTicketsResults`).innerText = 
             `Error: Not enough seats left for the seating class for at least one of the tickets you wanted to buy.
-            Either choose a different class, add yourself to the waitlist, or try again later`
+            Either choose a different class, add yourself to the waitlist, try buying fewer tickets at once, or try again later`
         } 
         else if (saveTickRes.length > 0) {
             for(let i = 0; i < allFullyValidedTickets.length; i++){
@@ -616,6 +617,7 @@ const getWaitlistInfo = async(ev)=>{
         let flightIdExists = await doesFlightIdExist(allValidTickets[j])
         let flightId2Exists = await doesFlightId2Exist(allValidTickets[j])
         let discountCodeExists = await doesDiscountCodeExist(allValidTickets[j])
+        let isValidConnectingFlight = await doesConnectingFlightExist(allValidTickets[j])
 
         if (!ssnExist) {
             document.getElementById(`waitListResults${j}`).innerText = `Error: The SSN ${allValidTickets[j].ssn} does not exist. Please register it above before buying a ticket with it.\n`
@@ -625,11 +627,14 @@ const getWaitlistInfo = async(ev)=>{
         }
         if (!flightId2Exists) {
             document.getElementById(`waitListResults${j}`).innerText = `Error: The connecting flightID ${allValidTickets[j].flightID2} does not exist. Please choose a valid flight.\n`
+        }  
+        if (!isValidConnectingFlight) {
+            document.getElementById(`waitListResults${j}`).innerText = `Error: FlightID ${allValidTickets[j].flightID2} is an invalid connecting flight for flightID ${allValidTickets[j].flightID}. Please choose a valid connecting flight.\n`
         }   
         if (!discountCodeExists) {
             document.getElementById(`buyTicketsResults${j}`).innerText = `Error: The discount code ${allValidTickets[j].discountCode} does not exist. Please choose a valid discount code or leave the discount code field blank.\n`
         }
-        if(ssnExist && flightIdExists && flightId2Exists && discountCodeExists) {
+        if(ssnExist && flightIdExists && flightId2Exists && isValidConnectingFlight && discountCodeExists) {
             allFullyValidedTickets.push(allValidTickets[j])
         }
     }
@@ -638,18 +643,13 @@ const getWaitlistInfo = async(ev)=>{
 
         allFullyValidedTickets = await getTotalTicketCost(allFullyValidedTickets)
         let saveWaitListRes = await saveWaitListInfo(allFullyValidedTickets)
-        let waitListPositionRes = await getWaitListPosition(saveWaitListRes)
-
-        if(saveWaitListRes === "Error adding to waitlist" ) {
-            document.getElementById(`waitListResults`).innerText = `Error: Could not add you to the waitlist.\n`
+        if(saveWaitListRes === "There are seats left on this flight." ) {
+            document.getElementById(`waitListResults`).innerText = `There are still seats left on this flight. Please book your flight above.
+            If there are not enough seats left for your entire party, either book fewer seats and waitlist the rest, 
+            or wait for more seats to open up before trying to book your whole party.\n`
         }
-        /* 
-        else if(saveTickRes === 'Error: not enough seats left') {
-            document.getElementById(`buyTicketsResults`).innerText = 
-            `Error: Not enough seats left for the seating class for at least one of the tickets you wanted to buy.
-            Either choose a different class, add yourself to the waitlist, or try again later`
-        }*/
-        else if (saveWaitListRes.length > 0) {
+        else if (saveWaitListRes.length > 1) {
+            let waitListPositionRes = await getWaitListPosition(saveWaitListRes)
             for(let i = 0; i < allFullyValidedTickets.length; i++){
                 if(saveWaitListRes[i].flightid2 === '-1') {
                     document.getElementById(`waitListResults${i}`).innerText = 
@@ -662,6 +662,8 @@ const getWaitlistInfo = async(ev)=>{
                     Your waitlist number ID ${saveWaitListRes[i].waitlist_id} and your position on the waitlist is ${waitListPositionRes}.\n`
                 } 
             }
+        } else {
+            document.getElementById(`waitListResults`).innerText = `Error: Could not add you to the waitlist.\n`
         }
     } else {
         document.getElementById(`waitListResults`).innerText = `Error: Please enter valid information to get added to a waitlist\n`

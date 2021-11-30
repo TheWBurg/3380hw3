@@ -223,3 +223,15 @@ export async function doesDiscountCodeExist(code) {
     console.log(res)
     return res;
 }
+
+export async function doesConnectingFlightExist(flightInfo) {
+    const response = await fetch(`http://localhost:5000/doesConnectingFlightExist`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+            },
+        body: JSON.stringify(flightInfo)});
+    let res = await response.json()
+    console.log(res)
+    return res;
+}

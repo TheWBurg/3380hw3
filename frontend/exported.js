@@ -402,7 +402,7 @@ const buyTicketInfo = async(ev)=>{
     // using the valid ticket information, this queries the database for the base ticket cost,
     // discount codes, and calculates the final cost.
     // It then displays which tickets were sucessfully bought
-    
+
     //console.log('length:' + allFullyValidedTickets.length)
     if(allFullyValidedTickets.length > 0 && (allFullyValidedTickets.length === allValidTickets.length)) {
 
@@ -645,7 +645,10 @@ const getWaitlistInfo = async(ev)=>{
         let flightIdExists = await doesFlightIdExist(allValidTickets[j])
         let flightId2Exists = await doesFlightId2Exist(allValidTickets[j])
         let discountCodeExists = await doesDiscountCodeExist(allValidTickets[j])
-        let isValidConnectingFlight = await doesConnectingFlightExist(allValidTickets[j])
+        let isValidConnectingFlight = true
+        if (allValidTickets[j].flightID2 != '-1') {
+            isValidConnectingFlight = await doesConnectingFlightExist(allValidTickets[j])
+        } 
 
         if (!ssnExist) {
             document.getElementById(`waitListResults${j}`).innerText = `Error: The SSN ${allValidTickets[j].ssn} does not exist. Please register it above before buying a ticket with it.\n`
@@ -676,7 +679,7 @@ const getWaitlistInfo = async(ev)=>{
             If there are not enough seats left for your entire party, either book fewer seats and waitlist the rest, 
             or wait for more seats to open up before trying to book your whole party.\n`
         }
-        else if (saveWaitListRes.length > 1) {
+        else if (saveWaitListRes.length > 0) {
             let waitListPositionRes = await getWaitListPosition(saveWaitListRes)
             for(let i = 0; i < allFullyValidedTickets.length; i++){
                 if(saveWaitListRes[i].flightid2 === '-1') {

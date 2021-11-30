@@ -139,7 +139,7 @@ function validateName(name){
 
 function validateNumber(number){
     let numbers = /^[0-9]+$/;
-    if (number.match(numbers)){
+    if (number.match(numbers)||number == "NA"){
         return true
     }
     else{

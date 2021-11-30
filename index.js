@@ -2,6 +2,7 @@ const express = require('express');
 const app = express();
 const cors = require('cors');
 const pool = require('./creds');
+var fs = require('fs');
 app.use(express.static('public'));
 
 // middleware
@@ -14,6 +15,10 @@ app.get('/select/:table_name', async function (req, res) {
     try{
         const {table_name} = req.params;
         const table = await pool.query(`Select * From ${table_name}`);
+        //dumping to query.sql
+        fs.appendFile("query.sql",`Select * From ${table_name}\n\n`, function(err){
+            if (err) throw err;
+        });
         console.log(table.rows);
         res.json(table.rows);
     }
@@ -28,6 +33,10 @@ app.get('/select/:customers', async function (req, res) {
     try{
         const {customers} = req.params;
         const table = await pool.query(`Select * From ${customers}`);
+        //dumping to query.sql
+        fs.appendFile("query.sql",`Select * From ${customers}\n\n`, function(err){
+            if (err) throw err;
+        });
         console.log(table.rows);
         res.json(table.rows);
     }
@@ -51,6 +60,13 @@ app.post('/addCustomer', async function (req, res) {
                 VALUES ('${c.ssn}', '${c.first_name}', '${c.last_name}', '${c.email}', '${c.phone_num}');
             END;`
         );
+        //dumping to transaction.sql
+        fs.appendFile("transaction.sql",`BEGIN;
+            INSERT INTO customer (ssn, first_name, last_name, email, phone_num)
+            VALUES ('${c.ssn}', '${c.first_name}', '${c.last_name}', '${c.email}', '${c.phone_num}');
+        END;\n\n`, function(err){
+            if (err) throw err;
+        });
     }
     catch(err) {
         console.log(err.message);
@@ -77,6 +93,15 @@ app.post('/searchFlight', async function (req, res) {
             AND 
             arrival_airport_id = (SELECT airport_id FROM airport WHERE airport_city = '${f.arrivalAirport}');`
         );
+        //dumping to query.sql
+        fs.appendFile("query.sql",
+        `SELECT * FROM flight WHERE 
+        departure_airport_id = (SELECT airport_id FROM airport WHERE airport_city = '${f.departureAirport}')
+        AND 
+        arrival_airport_id = (SELECT airport_id FROM airport WHERE airport_city = '${f.arrivalAirport}');\n\n`, 
+        function(err){
+            if (err) throw err;
+        });
     }
     catch(err) {
         console.log(err.message);
@@ -112,6 +137,23 @@ app.post('/searchConnectedFlight', async function (req, res) {
             `
         );
         console.log(q);
+        
+        fs.appendFile("query.sql",
+        `SELECT t1.flight_id AS flight_id1, t2.flight_id AS flight_id2, t1.departure_airport_id, t1.arrival_airport_id AS layover_airport_id, t2.arrival_airport_id AS destination_airport_id, 
+            t1.sch_departure_time, t1.sch_arrival_time AS layover_arrival_time, t2.sch_departure_time AS layover_departure_time, t2.sch_arrival_time AS destination_arrival_time,
+            t1.economy_seat_left AS t1_econ, t2.economy_seat_left AS t2_econ, t1.business_seat_left AS t1_bus, t2.business_seat_left AS t2_bus, t1.first_class_seat_left AS t1_first, 
+            t2.first_class_seat_left AS t2_first
+        FROM flight AS t1
+        INNER JOIN flight AS t2 ON t2.departure_airport_id = t1.arrival_airport_id
+        WHERE t1.departure_airport_id = (SELECT airport_id FROM airport WHERE airport_city = '${f.departureAirport}')
+        AND
+        t2.arrival_airport_id = (SELECT airport_id FROM airport WHERE airport_city = '${f.arrivalAirport}')
+        AND 
+        t1.sch_arrival_time < t2.sch_departure_time;`,function(err){
+            if (err) throw err;
+            //console.log('Saved!');
+        });
+        
     }
     catch(err) {
         console.log(err.message);
@@ -123,6 +165,7 @@ app.post('/searchConnectedFlight', async function (req, res) {
     res.json(q.rows);
     //res.sendStatus(200);
     console.log("Returned flight(s) from database");
+    
     return; 
 });
 
@@ -174,6 +217,9 @@ app.post('/saveTicketInfo', async function (req, res) {
     console.log(query)
     try {
         q = await pool.query(`${query}`);
+        fs.appendFile("transaction.sql",`${query}\n\n`, function(err){
+            if (err) throw err;
+        });
     }
     catch(err) {
         console.log(err.message);
@@ -211,6 +257,21 @@ app.post('/ticketBasePrice', async function (req, res) {
             FROM flight
             WHERE flight_id = ${f.flightID2};`
         );
+        fs.appendFile("query.sql",
+        `SELECT base_ticket_cost 
+        FROM flight
+        WHERE flight_id = ${f.flightID};\n\n`, 
+        function(err){
+            if (err) throw err;
+        });
+
+        fs.appendFile("query.sql",
+        `SELECT base_ticket_cost 
+        FROM flight
+        WHERE flight_id = ${f.flightID2};\n\n`, 
+        function(err){
+            if (err) throw err;
+        });
     }
     catch(err) {
         console.log(err.message);
@@ -241,6 +302,13 @@ app.post('/discountInfo', async function (req, res) {
             FROM discount
             WHERE discount_code = '${d.discountCode}';`
         );
+        fs.appendFile("query.sql",
+        `SELECT discount_amount, discount_type 
+        FROM discount
+        WHERE discount_code = '${d.discountCode}';\n\n`, 
+        function(err){
+            if (err) throw err;
+        });
     }
     catch(err) {
         console.log(err.message);
@@ -268,6 +336,13 @@ app.post('/checkSSN', async function (req, res) {
             FROM customer
             WHERE ssn = '${c.ssn}';`
         );
+        fs.appendFile("query.sql",
+        `SELECT ssn 
+        FROM customer
+        WHERE ssn = '${c.ssn}';\n\n`, 
+        function(err){
+            if (err) throw err;
+        });
     }
     catch(err) {
         console.log(err.message);
@@ -293,6 +368,13 @@ app.post('/checkTicket', async function (req, res) {
             FROM payment
             WHERE ticket_no = ${t.ticket_no} AND ssn = '${t.ssn}';`
         );
+        fs.appendFile("query.sql",
+        `SELECT ticket_no, ssn
+        FROM payment
+        WHERE ticket_no = ${t.ticket_no} AND ssn = '${t.ssn}';\n\n`, 
+        function(err){
+            if (err) throw err;
+        });
     }
     catch(err) {
         console.log(err.message);
@@ -342,6 +424,40 @@ app.post('/getTicketDetails', async function (req, res) {
 
             WHERE payment.ticket_no = ${t.ticket_no} AND payment.ssn = '${t.ssn}';`
         );
+        fs.appendFile("query.sql",
+        `SELECT
+        boarding_pass.ticket_no, boarding_pass.flight_id, boarding_pass.flight_id_2, boarding_pass.class_type, boarding_pass.num_bags, 
+
+        payment.final_price, payment.is_cancelled, 
+
+        f1.departure_airport_id AS f1_departure_airport_id, f1.arrival_airport_id AS f1_arrival_airport_id, 
+        f2.departure_airport_id AS f2_departure_airport_id, f2.arrival_airport_id AS f2_arrival_airport_id, 
+
+        f1.sch_departure_time AS f1_sch_departure_time, f1.sch_arrival_time AS f1_sch_arrival_time, 
+        f1.status AS f1_status, f1.departure_gate_code AS f1_departure_gate_code, f1.arrival_gate_code AS f1_arrival_gate_code,
+        f2.departure_airport_id AS f2_departure_airport_id, f2.arrival_airport_id AS f2_arrival_airport_id, 
+
+        f2.sch_departure_time AS f2_sch_departure_time, f2.sch_arrival_time AS f2_sch_arrival_time, 
+        f2.status AS f2_status, f2.departure_gate_code AS f2_departure_gate_code, f2.arrival_gate_code AS f2_arrival_gate_code,
+        
+        depAirport.airport_name AS f1_dep_airport_name, depAirport.airport_city AS f1_dep_airport_city_name, 
+        arAirport.airport_name AS f1_arr_airport_name, arAirport.airport_city AS f1_arr_airport_city_name,
+        arFinalAirport.airport_name AS f2_arr_airport_name, arFinalAirport.airport_city AS f2_arr_airport_ciy_name
+
+        FROM boarding_pass
+
+        INNER JOIN payment ON boarding_pass.ticket_no = payment.ticket_no
+        INNER JOIN flight f1 ON boarding_pass.flight_id = f1.flight_id
+        INNER JOIN flight f2 ON boarding_pass.flight_id_2 = f2.flight_id
+        INNER JOIN airport depAirport ON f1.departure_airport_id = depAirport.airport_id 
+        INNER JOIN airport arAirport ON f1.arrival_airport_id = arAirport.airport_id
+        INNER JOIN airport arFinalAirport ON f2.arrival_airport_id = arFinalAirport.airport_id
+
+        WHERE payment.ticket_no = ${t.ticket_no} AND payment.ssn = '${t.ssn}';\n\n`, 
+        function(err){
+            if (err) throw err;
+        });
+        
     }
     catch(err) {
         console.log(err.message);
@@ -375,6 +491,13 @@ app.post('/cancelticket', async function (req, res) {
             FROM PAYMENT
             WHERE ticket_no = ${t.ticket_no} AND is_cancelled = FALSE;`
         )
+        fs.appendFile("query.sql",
+        `SELECT *
+        FROM PAYMENT
+        WHERE ticket_no = ${t.ticket_no} AND is_cancelled = FALSE;\n\n`, 
+        function(err){
+            if (err) throw err;
+        });
         
     } catch(err) {
         console.log(err.message);
@@ -401,6 +524,23 @@ app.post('/cancelticket', async function (req, res) {
                 
                 END TRANSACTION;`
             );
+            fs.appendFile("transaction.sql",
+            `BEGIN TRANSACTION;  
+
+            UPDATE payment 
+            SET is_cancelled = true
+            WHERE ticket_no = ${t.ticket_no};
+            
+            UPDATE flight
+            SET ${seatsLeftDict[t.classType]} = ${seatsLeftDict[t.classType]} + 1
+            WHERE flight_id = (SELECT flight_id FROM boarding_pass WHERE ticket_no = ${t.ticket_no});
+            
+            
+            END TRANSACTION;\n\n`, 
+            function(err){
+                if (err) throw err;
+            });
+            
         }
         catch(err) {
             console.log(err.message);
@@ -426,6 +566,13 @@ app.post('/getClassType', async function (req, res) {
             FROM boarding_pass
             WHERE ticket_no = ${t.ticket_no};`
         );
+        fs.appendFile("query.sql",
+            `SELECT class_type
+            FROM boarding_pass
+            WHERE ticket_no = ${t.ticket_no};\n\n`, 
+            function(err){
+                if (err) throw err;
+            });
     }
     catch(err) {
         console.log(err.message);
@@ -449,6 +596,13 @@ app.post('/doesFlightIdExist', async function (req, res) {
             FROM flight
             WHERE flight_id = '${f.flightID}';`
         );
+        fs.appendFile("query.sql",
+            `SELECT *
+            FROM flight
+            WHERE flight_id = '${f.flightID}';\n\n`, 
+            function(err){
+                if (err) throw err;
+            });
     }
     catch(err) {
         console.log(err.message);
@@ -477,6 +631,13 @@ app.post('/doesFlightId2Exist', async function (req, res) {
             FROM flight
             WHERE flight_id = '${f.flightID2}';`
         );
+        fs.appendFile("query.sql",
+            `SELECT *
+            FROM flight
+            WHERE flight_id = '${f.flightID2}';\n\n`, 
+            function(err){
+                if (err) throw err;
+            });
     }
     catch(err) {
         console.log(err.message);
@@ -509,6 +670,13 @@ app.post('/howManySeatsLeft', async function (req, res) {
             FROM flight
             WHERE flight_id = '${s.flightID}';`
         );
+        fs.appendFile("query.sql",
+            `SELECT ${seatsLeftDict[s.classType]}
+            FROM flight
+            WHERE flight_id = '${s.flightID}';\n\n`, 
+            function(err){
+                if (err) throw err;
+            });
     }
     catch(err) {
         console.log(err.message);
@@ -535,6 +703,13 @@ app.post('/doesSsnExist', async function (req, res) {
             FROM customer
             WHERE ssn = '${c.ssn}';`
         );
+        fs.appendFile("query.sql",
+            `SELECT 
+            FROM customer
+            WHERE ssn = '${c.ssn}';\n\n`, 
+            function(err){
+                if (err) throw err;
+            });
     }
     catch(err) {
         console.log(err.message);
@@ -572,6 +747,15 @@ app.post('/saveWaitListInfo', async function (req, res) {
             GROUP BY f1_seatLeft, f2_seatLeft
             HAVING f1.${seatsLeftDict[w.classType]} > 0 AND f2.${seatsLeftDict[w.classType]} > 0;`
         );
+        fs.appendFile("query.sql",
+            `SELECT f1.${seatsLeftDict[w.classType]} AS f1_seatLeft, f2.${seatsLeftDict[w.classType]} AS f2_seatLeft
+            FROM flight AS f1, flight AS f2
+            WHERE f1.flight_id = ${w.flightID} AND f2.flight_id = ${w.flightID2}
+            GROUP BY f1_seatLeft, f2_seatLeft
+            HAVING f1.${seatsLeftDict[w.classType]} > 0 AND f2.${seatsLeftDict[w.classType]} > 0;\n\n`, 
+            function(err){
+                if (err) throw err;
+            });
     } catch(err) {
         console.log(err.message);
         res.json(err.message)
@@ -605,6 +789,34 @@ app.post('/saveWaitListInfo', async function (req, res) {
                     
                 END TRANSACTION;
             `)
+            fs.appendFile("transaction.sql",
+            `BEGIN TRANSACTION; 
+            CREATE TEMP TABLE waitlistInfo(
+                waitlist_id INT,
+                ssn VARCHAR(50),
+                flightID VARCHAR(50),
+                flightID2 VARCHAR(50),
+                position INT
+            );
+            
+            WITH ins0 AS (
+            INSERT INTO boarding_pass (flight_id, flight_id_2, class_type, num_bags, is_waitlisted)
+            VALUES (${w.flightID}, ${w.flightID2}, '${w.classType}', ${w.numBags}, 'TRUE')
+            RETURNING ticket_no)
+        
+            INSERT INTO payment (ticket_no, ssn, credit_card_num, taxes, discount_code, final_price, flight_id, flight_id_2, is_cancelled)
+            VALUES ((SELECT ticket_no FROM ins0), '${w.ssn}', '${w.creditCardNum}', 'NA', '${w.discountCode}', ${w.totalCost}, ${w.flightID}, ${w.flightID2}, FALSE);
+
+            INSERT INTO waitlist (waitlist_id, ssn, flight_id, flight_id_2, is_waitlisted)
+            VALUES ((SELECT ticket_no FROM payment ORDER BY payment DESC limit 1), ${w.ssn}, ${w.flightID}, ${w.flightID2}, 'TRUE');
+    
+            INSERT INTO waitlistInfo(waitlist_id, ssn, flightID, flightID2, position)
+            values ((SELECT waitlist_id FROM waitlist ORDER BY waitlist_id DESC limit 1), ${w.ssn}, ${w.flightID}, ${w.flightID2}, (SELECT position FROM waitlist ORDER BY waitlist_id DESC limit 1));
+                
+            END TRANSACTION;\n\n`, 
+            function(err){
+                if (err) throw err;
+            });
         } catch(err) {
             console.log(err.message);
             res.json("Error adding to waitlist")
@@ -634,6 +846,14 @@ app.post('/getWaitListPosition', async function (req, res) {
             WHERE position <= ${p.position} AND is_waitlisted = 'TRUE'
             ORDER BY position ASC;`
         );
+        fs.appendFile("query.sql",
+            `SELECT position
+            FROM waitlist
+            WHERE position <= ${p.position} AND is_waitlisted = 'TRUE'
+            ORDER BY position ASC;\n\n`, 
+            function(err){
+                if (err) throw err;
+            });
     }
     catch(err) {
         console.log(err.message);
@@ -656,6 +876,13 @@ app.post('/doesDiscountCodeExist', async function (req, res) {
             FROM discount
             WHERE discount_code = '${d.discountCode}';`
         );
+        fs.appendFile("query.sql",
+            `SELECT discount_code
+            FROM discount
+            WHERE discount_code = '${d.discountCode}';\n\n`, 
+            function(err){
+                if (err) throw err;
+            });
     }
     catch(err) {
         console.log(err.message);
@@ -682,6 +909,13 @@ app.post('/doesConnectingFlightExist', async function (req, res) {
             FROM airport 
             WHERE airport_id = (SELECT departure_airport_id FROM flight WHERE flight_id = ${f.flightID})`
         )
+        fs.appendFile("query.sql",
+            `SELECT airport_city
+            FROM airport 
+            WHERE airport_id = (SELECT departure_airport_id FROM flight WHERE flight_id = ${f.flightID})\n\n`, 
+            function(err){
+                if (err) throw err;
+            });
     }
     catch(err) {
         console.log(err.message);
@@ -694,6 +928,13 @@ app.post('/doesConnectingFlightExist', async function (req, res) {
             FROM airport 
             WHERE airport_id = (SELECT arrival_airport_id FROM flight WHERE flight_id = ${f.flightID2})`
         )
+        fs.appendFile("query.sql",
+            `SELECT airport_city
+            FROM airport 
+            WHERE airport_id = (SELECT departure_airport_id FROM flight WHERE flight_id = ${f.flightID2})\n\n`, 
+            function(err){
+                if (err) throw err;
+            });
     }
     catch(err) {
         console.log(err.message);
@@ -719,6 +960,25 @@ app.post('/doesConnectingFlightExist', async function (req, res) {
             t1.sch_arrival_time < t2.sch_departure_time
             AND t1.flight_id = ${f.flightID} AND t2.flight_id = ${f.flightID2};`
         );
+        fs.appendFile("query.sql",
+            `SELECT t1.flight_id AS flight_id1, t2.flight_id AS flight_id2, t1.departure_airport_id, t1.arrival_airport_id AS layover_airport_id, t2.arrival_airport_id AS destination_airport_id, 
+            t1.sch_departure_time, t1.sch_arrival_time AS layover_arrival_time, t2.sch_departure_time AS layover_departure_time, t2.sch_arrival_time AS destination_arrival_time,
+            t1.economy_seat_left AS t1_econ, t2.economy_seat_left AS t2_econ, t1.business_seat_left AS t1_bus, t2.business_seat_left AS t2_bus, t1.first_class_seat_left AS t1_first, 
+            t2.first_class_seat_left AS t2_first
+
+            FROM flight AS t1
+
+            INNER JOIN flight AS t2 ON t2.departure_airport_id = t1.arrival_airport_id
+
+            WHERE t1.departure_airport_id = (SELECT airport_id FROM airport WHERE airport_city = '${r.rows[0].airport_city}')
+            AND
+            t2.arrival_airport_id = (SELECT airport_id FROM airport WHERE airport_city = '${s.rows[0].airport_city}')
+            AND 
+            t1.sch_arrival_time < t2.sch_departure_time
+            AND t1.flight_id = ${f.flightID} AND t2.flight_id = ${f.flightID2};\n\n`, 
+            function(err){
+                if (err) throw err;
+            });
     }
     catch(err) {
         console.log(err.message);

@@ -16,3 +16,25 @@ string comparison in javascript
 https://pretagteam.com/question/check-if-string-contains-only-letters-in-javascript
 
 Changed SSN to User-Name on the front end. SSN in the database signifies User name for all intents and purposes.
+
+functional dependencies:
+BCNF violations
+airport table
+-airport_name->airport_code
+
+aircraft table
+full_name->model
+
+waitlist table
+position->waitlist_id
+
+Removing these BCNF violations would have been counterproductive. 
+In the case of airport_name->airport_code and full_name->model, these
+dependencies merely add information that makes the database easier to use.
+The dependency between position and waitlist_id keeps the database from having
+to update every position when someone is taken off the waitlist.
+
+query.sql and transaction.sql files write all queries that are sent to the 
+database. If the files are deleted they are created again by the program when
+the next query is written.
+

@@ -191,8 +191,8 @@ app.post('/saveTicketInfo', async function (req, res) {
     for(i = 0; i < t.length; i++) {
         query = query + 
         `WITH ins${i} AS (
-        INSERT INTO boarding_pass (flight_id, flight_id_2, class_type, num_bags, is_waitlisted)
-        VALUES (${t[i].flightID}, ${t[i].flightID2}, '${t[i].classType}', ${t[i].numBags}, 'FALSE')
+        INSERT INTO boarding_pass (flight_id, flight_id_2, class_type, num_bags)
+        VALUES (${t[i].flightID}, ${t[i].flightID2}, '${t[i].classType}', ${t[i].numBags})
         RETURNING ticket_no)
     
         INSERT INTO payment (ticket_no, ssn, credit_card_num, taxes, discount_code, final_price, is_cancelled)
@@ -395,7 +395,8 @@ app.post('/getTicketDetails', async function (req, res) {
     try {
         q = await pool.query (
             `SELECT
-            boarding_pass.ticket_no, boarding_pass.flight_id, boarding_pass.flight_id_2, boarding_pass.class_type, boarding_pass.num_bags, waitlist.position, boarding_pass.is_waitlisted,
+            boarding_pass.ticket_no, boarding_pass.flight_id, boarding_pass.flight_id_2, boarding_pass.class_type, boarding_pass.num_bags, 
+            waitlist.position, waitlist.is_waitlisted,
 
             payment.final_price, payment.is_cancelled, 
 
@@ -427,7 +428,7 @@ app.post('/getTicketDetails', async function (req, res) {
         );
         fs.appendFile("query.sql",
         `SELECT
-        boarding_pass.ticket_no, boarding_pass.flight_id, boarding_pass.flight_id_2, boarding_pass.class_type, boarding_pass.num_bags, waitlist.position, boarding_pass.is_waitlisted,
+        boarding_pass.ticket_no, boarding_pass.flight_id, boarding_pass.flight_id_2, boarding_pass.class_type, boarding_pass.num_bags, waitlist.position, waitlist.is_waitlisted,
 
         payment.final_price, payment.is_cancelled, 
 
@@ -551,17 +552,6 @@ app.post('/cancelticket', async function (req, res) {
                     UPDATE payment 
                     SET is_cancelled = TRUE
                     WHERE ticket_no = ${t.ticket_no};
-
-                    UPDATE boarding_pass
-                    SET is_waitlisted = FALSE
-                    WHERE ticket_no = (
-                        SELECT waitlist_id FROM (
-                            SELECT *
-                            FROM waitlist AS w
-                            INNER JOIN boarding_pass AS b ON waitlist_id = ticket_no
-                            WHERE w.flight_id = ${r.rows[0].flight_id} AND w.flight_id_2 = ${r.rows[0].flight_id_2}
-                            AND w.is_waitlisted = 'TRUE' AND b.class_type = '${t.classType}') AS activeWaitlist
-                        ORDER BY activeWaitlist.position ASC limit 1);
 
                     UPDATE waitlist 
                     SET is_waitlisted = FALSE 
@@ -811,8 +801,8 @@ app.post('/saveWaitListInfo', async function (req, res) {
                 );
                 
                 WITH ins0 AS (
-                INSERT INTO boarding_pass (flight_id, flight_id_2, class_type, num_bags, is_waitlisted)
-                VALUES (${w.flightID}, ${w.flightID2}, '${w.classType}', ${w.numBags}, 'TRUE')
+                INSERT INTO boarding_pass (flight_id, flight_id_2, class_type, num_bags)
+                VALUES (${w.flightID}, ${w.flightID2}, '${w.classType}', ${w.numBags})
                 RETURNING ticket_no)
             
                 INSERT INTO payment (ticket_no, ssn, credit_card_num, taxes, discount_code, final_price, is_cancelled)
@@ -837,7 +827,7 @@ app.post('/saveWaitListInfo', async function (req, res) {
             );
             
             WITH ins0 AS (
-            INSERT INTO boarding_pass (flight_id, flight_id_2, class_type, num_bags, is_waitlisted)
+            INSERT INTO boarding_pass (flight_id, flight_id_2, class_type, num_bags)
             VALUES (${w.flightID}, ${w.flightID2}, '${w.classType}', ${w.numBags}, 'TRUE')
             RETURNING ticket_no)
         
@@ -905,6 +895,38 @@ app.post('/getWaitListPosition', async function (req, res) {
  
 });
 
+app.post('/getWaitListPositionForStatus', async function (req, res) {
+    console.log('Got getWaitListPositionForStatus body:', req.body);
+    let p = req.body[0]; 
+    let q
+
+    try {
+        q = await pool.query (
+            `SELECT position
+            FROM waitlist
+            WHERE position <= ${p.position} AND is_waitlisted = 'TRUE'
+            AND flight_id = ${p.flight_id} AND flight_id_2 = ${p.flight_id_2}
+            ORDER BY position ASC;`
+        );
+        fs.appendFile("query.sql",
+            `SELECT position
+            FROM waitlist
+            WHERE position <= ${p.position} AND is_waitlisted = 'TRUE'
+            AND flight_id = ${p.flight_id} AND flight_id_2 = ${p.flight_id_2}
+            ORDER BY position ASC;\n\n`, 
+            function(err){
+                if (err) throw err;
+            });
+    }
+    catch(err) {
+        console.log(err.message);
+        res.json(err.message)
+        return;
+    }
+    res.json(q.rowCount)
+    return 
+ 
+});
 app.post('/doesDiscountCodeExist', async function (req, res) {
     console.log('Got doesDiscountCodeExist body:', req.body);
     let d = req.body; 

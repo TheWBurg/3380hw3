@@ -1,4 +1,4 @@
-import {getDiscountInfo,getWaitlistPositionQualifier, saveCustomer, getFlightsDetails, getConnectedFlightDetails, saveTicketInfo, getTicketBasePrice, checkSSN, checkTicket, getTicketDetails, cancelThisTicket, getClassType, doesSsnExist, doesFlightIdExist, doesFlightId2Exist, saveWaitListInfo, getWaitListPosition, doesDiscountCodeExist, doesConnectingFlightExist} from "../test/databaseFunctions.js";
+import {getDiscountInfo,getWaitlistPositionQualifier, saveCustomer, getFlightsDetails, getConnectedFlightDetails, saveTicketInfo, getTicketBasePrice, checkSSN, checkTicket, getTicketDetails, cancelThisTicket, getClassType, doesSsnExist, doesFlightIdExist, doesFlightId2Exist, saveWaitListInfo, getWaitListPosition, doesDiscountCodeExist, doesConnectingFlightExist, getWaitListPositionForStatus} from "../test/databaseFunctions.js";
 //import { getFlightsDetails } from "../test/databaseFunctions.js";
 //import from "../test/databaseFunctions.js";
 
@@ -525,7 +525,8 @@ const checkTicketStatus = async(ev) => {
                     //let waitlistPositionQualifier = []; 
                     //waitlistPositionQualifier[0]= await getWaitlistPositionQualifier(res);
                     //console.log(waitlistPositionQualifier[0]);
-                    let waitlistPosition = await getWaitListPosition(res)
+                    let waitlistPosition = await getWaitListPositionForStatus(res)
+                    //let waitlistPosition = await getWaitListPosition(res)
                     document.getElementById('waitlistPosition').innerText = `waitlist position: ${waitlistPosition}`;
                 }
                 else{

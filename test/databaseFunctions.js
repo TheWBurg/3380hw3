@@ -247,3 +247,16 @@ export async function getWaitlistPositionQualifier(info) {
     console.log(res)
     return res;
 }
+
+
+export async function getWaitListPositionForStatus(info) {
+    const response = await fetch(`http://localhost:5000/getWaitListPositionForStatus`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+            },
+        body: JSON.stringify(info)});
+    let res = await response.json()
+    console.log(res)
+    return res;
+}

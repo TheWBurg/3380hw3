@@ -766,3 +766,36 @@ WITH ins0 AS (
 		WHERE flight_id = 7;
 END TRANSACTION;
 
+
+    BEGIN TRANSACTION; 
+    CREATE TEMP TABLE boughtTicks(
+        ticketNo INT, 
+        finalPrice FLOAT,
+        ssn VARCHAR(50),
+        flightID VARCHAR(50),
+        flightID2 VARCHAR(50)
+    );
+WITH ins0 AS (
+        INSERT INTO boarding_pass (flight_id, flight_id_2, class_type, num_bags)
+        VALUES (1, -1, 'economy', 1)
+        RETURNING ticket_no)
+    
+        INSERT INTO payment (ticket_no, ssn, credit_card_num, taxes, discount_code, final_price, is_cancelled)
+        VALUES ((SELECT ticket_no FROM ins0), 'will', '1', 'NA', '10PCTOFF', 337.5, FALSE);
+
+        INSERT INTO boughtTicks(ticketNo, finalPrice, ssn, flightID, flightID2)
+        values ((SELECT ticket_no FROM payment ORDER BY ticket_no DESC limit 1), 337.5, 'will', 1, -1);
+
+        UPDATE flight
+        SET economy_seat_left  = (SELECT  economy_seat_left FROM flight WHERE flight_id = 1) - 1
+        WHERE flight_id = 1;
+
+        UPDATE flight
+        SET economy_seat_left = 
+		  	CASE -1 
+				WHEN -1 THEN 0 
+				ELSE (SELECT economy_seat_left FROM flight where flight_id = -1) - 1
+			END
+		WHERE flight_id = -1;
+END TRANSACTION;
+

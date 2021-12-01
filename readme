@@ -1,0 +1,16 @@
+team 03 members
+dbs033
+dbs007
+
+Installations
+This team’s web application used the following installations:
+-npm install node
+-npm install node-fetch
+-npm install cors
+-npm install express
+
+sources used
+TA example program
+https://github.com/tian1001tx/cosc3380
+string comparison in javascript
+https://pretagteam.com/question/check-if-string-contains-only-letters-in-javascript

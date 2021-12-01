@@ -520,6 +520,11 @@ app.post('/cancelticket', async function (req, res) {
             r = await pool.query(
                 `SELECT * FROM boarding_pass WHERE ticket_no = ${t.ticket_no};`
             );
+            fs.appendFile("query.sql",
+            `SELECT * FROM boarding_pass WHERE ticket_no = ${t.ticket_no};\n\n`, 
+            function(err){
+                if (err) throw err;
+            });
             // checks if there is anyone on the waitlist of the flight(s) and class of the person cancelling their ticket
             s = await pool.query(
                 `SELECT * 
@@ -528,6 +533,15 @@ app.post('/cancelticket', async function (req, res) {
                 WHERE w.flight_id = ${r.rows[0].flight_id} AND w.flight_id_2 = ${r.rows[0].flight_id_2} 
                 AND w.is_waitlisted = 'TRUE' AND b.class_type = '${r.rows[0].class_type}';`
             );
+            fs.appendFile("query.sql",
+            `SELECT * 
+            FROM waitlist AS w
+            INNER JOIN boarding_pass AS b ON waitlist_id = ticket_no
+            WHERE w.flight_id = ${r.rows[0].flight_id} AND w.flight_id_2 = ${r.rows[0].flight_id_2} 
+            AND w.is_waitlisted = 'TRUE' AND b.class_type = '${r.rows[0].class_type}';\n\n`, 
+            function(err){
+                if (err) throw err;
+            });
             console.log(s.rowCount)
             // nobody was on the waitlist, so just cancel the ticket
             if(s.rowCount === 0) {
@@ -545,6 +559,22 @@ app.post('/cancelticket', async function (req, res) {
                     
                     END TRANSACTION;`
                 );
+                fs.appendFile("query.sql",
+                `BEGIN TRANSACTION;  
+    
+                UPDATE payment 
+                SET is_cancelled = true
+                WHERE ticket_no = ${t.ticket_no};
+                
+                UPDATE flight
+                SET ${seatsLeftDict[t.classType]} = ${seatsLeftDict[t.classType]} + 1
+                WHERE flight_id = (SELECT flight_id FROM boarding_pass WHERE ticket_no = ${t.ticket_no});
+                
+                
+                END TRANSACTION;\n\n`, 
+                function(err){
+                    if (err) throw err;
+                });
             // someone was on the waitlist, so cancel the ticket, and move the first person on the waitlist onto the flight
             } else {
                 w = await pool.query(
@@ -567,6 +597,28 @@ app.post('/cancelticket', async function (req, res) {
 
                     END TRANSACTION;`
                 )
+                fs.appendFile("query.sql",
+                `BEGIN TRANSACTION;
+                    
+                UPDATE payment 
+                SET is_cancelled = TRUE
+                WHERE ticket_no = ${t.ticket_no};
+
+                UPDATE waitlist 
+                SET is_waitlisted = FALSE 
+                WHERE waitlist_id = (                      
+                    SELECT waitlist_id FROM (
+                        SELECT *
+                        FROM waitlist AS w
+                        INNER JOIN boarding_pass AS b ON waitlist_id = ticket_no
+                        WHERE w.flight_id = ${r.rows[0].flight_id} AND w.flight_id_2 = ${r.rows[0].flight_id_2}
+                        AND w.is_waitlisted = 'TRUE' AND b.class_type = '${t.classType}') AS activeWaitlist
+                    ORDER BY activeWaitlist.position ASC limit 1);
+
+                END TRANSACTION;\n\n`, 
+                function(err){
+                    if (err) throw err;
+                });
             }
         }
         catch(err) {

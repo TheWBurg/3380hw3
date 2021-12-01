@@ -199,7 +199,7 @@ app.post('/saveTicketInfo', async function (req, res) {
         VALUES ((SELECT ticket_no FROM ins${i}), '${t[i].ssn}', '${t[i].creditCardNum}', 'NA', '${t[i].discountCode}', ${t[i].totalCost}, FALSE);
 
         INSERT INTO boughtTicks(ticketNo, finalPrice, ssn, flightID, flightID2)
-        values ((SELECT ticket_no FROM payment ORDER BY ticket_no DESC limit 1), ${t[i].totalCost}, ${t[i].ssn}, ${t[i].flightID}, ${t[i].flightID2});
+        values ((SELECT ticket_no FROM payment ORDER BY ticket_no DESC limit 1), ${t[i].totalCost}, '${t[i].ssn}', ${t[i].flightID}, ${t[i].flightID2});
 
         UPDATE flight
         SET ${seatsLeftDict[t[i].classType]}  = (SELECT  ${seatsLeftDict[t[i].classType]} FROM flight WHERE flight_id = ${t[i].flightID}) - 1
@@ -797,6 +797,7 @@ app.post('/saveWaitListInfo', async function (req, res) {
         res.json(err.message)
         return;
     }
+    console.log(q.rowCount)
     if (q.rowCount === 0) {
         try {
             r = await pool.query (
@@ -818,10 +819,10 @@ app.post('/saveWaitListInfo', async function (req, res) {
                 VALUES ((SELECT ticket_no FROM ins0), '${w.ssn}', '${w.creditCardNum}', 'NA', '${w.discountCode}', ${w.totalCost}, FALSE);
     
                 INSERT INTO waitlist (waitlist_id, ssn, flight_id, flight_id_2, is_waitlisted)
-                VALUES ((SELECT ticket_no FROM payment ORDER BY payment DESC limit 1), ${w.ssn}, ${w.flightID}, ${w.flightID2}, 'TRUE');
+                VALUES ((SELECT ticket_no FROM payment ORDER BY payment DESC limit 1), '${w.ssn}', ${w.flightID}, ${w.flightID2}, 'TRUE');
         
                 INSERT INTO waitlistInfo(waitlist_id, ssn, flightID, flightID2, position)
-                values ((SELECT waitlist_id FROM waitlist ORDER BY waitlist_id DESC limit 1), ${w.ssn}, ${w.flightID}, ${w.flightID2}, (SELECT position FROM waitlist ORDER BY waitlist_id DESC limit 1));
+                values ((SELECT waitlist_id FROM waitlist ORDER BY waitlist_id DESC limit 1), '${w.ssn}', ${w.flightID}, ${w.flightID2}, (SELECT position FROM waitlist ORDER BY waitlist_id DESC limit 1));
                     
                 END TRANSACTION;
             `)
@@ -881,12 +882,14 @@ app.post('/getWaitListPosition', async function (req, res) {
             `SELECT position
             FROM waitlist
             WHERE position <= ${p.position} AND is_waitlisted = 'TRUE'
+            AND flight_id = ${p.flightid} AND flight_id_2 = ${p.flightid2}
             ORDER BY position ASC;`
         );
         fs.appendFile("query.sql",
             `SELECT position
             FROM waitlist
             WHERE position <= ${p.position} AND is_waitlisted = 'TRUE'
+            AND flight_id = ${p.flightid} AND flight_id_2 = ${p.flightid2}
             ORDER BY position ASC;\n\n`, 
             function(err){
                 if (err) throw err;

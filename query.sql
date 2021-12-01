@@ -1296,3 +1296,566 @@ SELECT position
             WHERE position <= 1 AND is_waitlisted = 'TRUE'
             ORDER BY position ASC;
 
+SELECT ssn 
+        FROM customer
+        WHERE ssn = 'will';
+
+SELECT ssn 
+        FROM customer
+        WHERE ssn = 'will';
+
+SELECT 
+            FROM customer
+            WHERE ssn = 'will';
+
+SELECT *
+            FROM flight
+            WHERE flight_id = '2';
+
+SELECT *
+            FROM flight
+            WHERE flight_id = '-1';
+
+SELECT discount_code
+            FROM discount
+            WHERE discount_code = 'NA';
+
+SELECT base_ticket_cost 
+        FROM flight
+        WHERE flight_id = 2;
+
+SELECT base_ticket_cost 
+        FROM flight
+        WHERE flight_id = -1;
+
+SELECT discount_amount, discount_type 
+        FROM discount
+        WHERE discount_code = 'NA';
+
+SELECT f1.economy_seat_left AS f1_seatLeft, f2.economy_seat_left AS f2_seatLeft
+            FROM flight AS f1, flight AS f2
+            WHERE f1.flight_id = 2 AND f2.flight_id = -1
+            GROUP BY f1_seatLeft, f2_seatLeft
+            HAVING f1.economy_seat_left > 0 AND f2.economy_seat_left > 0;
+
+SELECT 
+            FROM customer
+            WHERE ssn = 'will';
+
+SELECT *
+            FROM flight
+            WHERE flight_id = '2';
+
+SELECT *
+            FROM flight
+            WHERE flight_id = '-1';
+
+SELECT discount_code
+            FROM discount
+            WHERE discount_code = 'NA';
+
+SELECT base_ticket_cost 
+        FROM flight
+        WHERE flight_id = -1;
+
+SELECT base_ticket_cost 
+        FROM flight
+        WHERE flight_id = 2;
+
+SELECT discount_amount, discount_type 
+        FROM discount
+        WHERE discount_code = 'NA';
+
+SELECT f1.economy_seat_left AS f1_seatLeft, f2.economy_seat_left AS f2_seatLeft
+            FROM flight AS f1, flight AS f2
+            WHERE f1.flight_id = 2 AND f2.flight_id = -1
+            GROUP BY f1_seatLeft, f2_seatLeft
+            HAVING f1.economy_seat_left > 0 AND f2.economy_seat_left > 0;
+
+SELECT 
+            FROM customer
+            WHERE ssn = 'will';
+
+SELECT *
+            FROM flight
+            WHERE flight_id = '2';
+
+SELECT *
+            FROM flight
+            WHERE flight_id = '-1';
+
+SELECT discount_code
+            FROM discount
+            WHERE discount_code = 'NA';
+
+SELECT base_ticket_cost 
+        FROM flight
+        WHERE flight_id = 2;
+
+SELECT base_ticket_cost 
+        FROM flight
+        WHERE flight_id = -1;
+
+SELECT discount_amount, discount_type 
+        FROM discount
+        WHERE discount_code = 'NA';
+
+SELECT f1.economy_seat_left AS f1_seatLeft, f2.economy_seat_left AS f2_seatLeft
+            FROM flight AS f1, flight AS f2
+            WHERE f1.flight_id = 2 AND f2.flight_id = -1
+            GROUP BY f1_seatLeft, f2_seatLeft
+            HAVING f1.economy_seat_left > 0 AND f2.economy_seat_left > 0;
+
+SELECT 
+            FROM customer
+            WHERE ssn = 'will';
+
+SELECT *
+            FROM flight
+            WHERE flight_id = '2';
+
+SELECT *
+            FROM flight
+            WHERE flight_id = '-1';
+
+SELECT discount_code
+            FROM discount
+            WHERE discount_code = 'NA';
+
+SELECT base_ticket_cost 
+        FROM flight
+        WHERE flight_id = 2;
+
+SELECT base_ticket_cost 
+        FROM flight
+        WHERE flight_id = -1;
+
+SELECT discount_amount, discount_type 
+        FROM discount
+        WHERE discount_code = 'NA';
+
+SELECT f1.economy_seat_left AS f1_seatLeft, f2.economy_seat_left AS f2_seatLeft
+            FROM flight AS f1, flight AS f2
+            WHERE f1.flight_id = 2 AND f2.flight_id = -1
+            GROUP BY f1_seatLeft, f2_seatLeft
+            HAVING f1.economy_seat_left > 0 AND f2.economy_seat_left > 0;
+
+SELECT ssn 
+        FROM customer
+        WHERE ssn = 'will';
+
+SELECT 
+            FROM customer
+            WHERE ssn = 'will';
+
+SELECT *
+            FROM flight
+            WHERE flight_id = '2';
+
+SELECT *
+            FROM flight
+            WHERE flight_id = '-1';
+
+SELECT discount_code
+            FROM discount
+            WHERE discount_code = 'NA';
+
+SELECT base_ticket_cost 
+        FROM flight
+        WHERE flight_id = 2;
+
+SELECT base_ticket_cost 
+        FROM flight
+        WHERE flight_id = -1;
+
+SELECT discount_amount, discount_type 
+        FROM discount
+        WHERE discount_code = 'NA';
+
+SELECT f1.economy_seat_left AS f1_seatLeft, f2.economy_seat_left AS f2_seatLeft
+            FROM flight AS f1, flight AS f2
+            WHERE f1.flight_id = 2 AND f2.flight_id = -1
+            GROUP BY f1_seatLeft, f2_seatLeft
+            HAVING f1.economy_seat_left > 0 AND f2.economy_seat_left > 0;
+
+SELECT 
+            FROM customer
+            WHERE ssn = 'will';
+
+SELECT *
+            FROM flight
+            WHERE flight_id = '2';
+
+SELECT *
+            FROM flight
+            WHERE flight_id = '-1';
+
+SELECT discount_code
+            FROM discount
+            WHERE discount_code = 'NA';
+
+SELECT base_ticket_cost 
+        FROM flight
+        WHERE flight_id = 2;
+
+SELECT base_ticket_cost 
+        FROM flight
+        WHERE flight_id = -1;
+
+SELECT discount_amount, discount_type 
+        FROM discount
+        WHERE discount_code = 'NA';
+
+SELECT f1.economy_seat_left AS f1_seatLeft, f2.economy_seat_left AS f2_seatLeft
+            FROM flight AS f1, flight AS f2
+            WHERE f1.flight_id = 2 AND f2.flight_id = -1
+            GROUP BY f1_seatLeft, f2_seatLeft
+            HAVING f1.economy_seat_left > 0 AND f2.economy_seat_left > 0;
+
+SELECT 
+            FROM customer
+            WHERE ssn = 'will';
+
+SELECT *
+            FROM flight
+            WHERE flight_id = '2';
+
+SELECT *
+            FROM flight
+            WHERE flight_id = '-1';
+
+SELECT discount_code
+            FROM discount
+            WHERE discount_code = 'NA';
+
+SELECT base_ticket_cost 
+        FROM flight
+        WHERE flight_id = -1;
+
+SELECT base_ticket_cost 
+        FROM flight
+        WHERE flight_id = 2;
+
+SELECT discount_amount, discount_type 
+        FROM discount
+        WHERE discount_code = 'NA';
+
+SELECT f1.economy_seat_left AS f1_seatLeft, f2.economy_seat_left AS f2_seatLeft
+            FROM flight AS f1, flight AS f2
+            WHERE f1.flight_id = 2 AND f2.flight_id = -1
+            GROUP BY f1_seatLeft, f2_seatLeft
+            HAVING f1.economy_seat_left > 0 AND f2.economy_seat_left > 0;
+
+SELECT 
+            FROM customer
+            WHERE ssn = 'will';
+
+SELECT *
+            FROM flight
+            WHERE flight_id = '2';
+
+SELECT *
+            FROM flight
+            WHERE flight_id = '-1';
+
+SELECT discount_code
+            FROM discount
+            WHERE discount_code = 'NA';
+
+SELECT base_ticket_cost 
+        FROM flight
+        WHERE flight_id = 2;
+
+SELECT base_ticket_cost 
+        FROM flight
+        WHERE flight_id = -1;
+
+SELECT discount_amount, discount_type 
+        FROM discount
+        WHERE discount_code = 'NA';
+
+SELECT f1.economy_seat_left AS f1_seatLeft, f2.economy_seat_left AS f2_seatLeft
+            FROM flight AS f1, flight AS f2
+            WHERE f1.flight_id = 2 AND f2.flight_id = -1
+            GROUP BY f1_seatLeft, f2_seatLeft
+            HAVING f1.economy_seat_left > 0 AND f2.economy_seat_left > 0;
+
+SELECT 
+            FROM customer
+            WHERE ssn = 'will';
+
+SELECT *
+            FROM flight
+            WHERE flight_id = '2';
+
+SELECT *
+            FROM flight
+            WHERE flight_id = '-1';
+
+SELECT discount_code
+            FROM discount
+            WHERE discount_code = 'NA';
+
+SELECT base_ticket_cost 
+        FROM flight
+        WHERE flight_id = 2;
+
+SELECT base_ticket_cost 
+        FROM flight
+        WHERE flight_id = -1;
+
+SELECT discount_amount, discount_type 
+        FROM discount
+        WHERE discount_code = 'NA';
+
+SELECT f1.economy_seat_left AS f1_seatLeft, f2.economy_seat_left AS f2_seatLeft
+            FROM flight AS f1, flight AS f2
+            WHERE f1.flight_id = 2 AND f2.flight_id = -1
+            GROUP BY f1_seatLeft, f2_seatLeft
+            HAVING f1.economy_seat_left > 0 AND f2.economy_seat_left > 0;
+
+SELECT 
+            FROM customer
+            WHERE ssn = 'will';
+
+SELECT *
+            FROM flight
+            WHERE flight_id = '2';
+
+SELECT *
+            FROM flight
+            WHERE flight_id = '-1';
+
+SELECT discount_code
+            FROM discount
+            WHERE discount_code = 'NA';
+
+SELECT base_ticket_cost 
+        FROM flight
+        WHERE flight_id = 2;
+
+SELECT base_ticket_cost 
+        FROM flight
+        WHERE flight_id = -1;
+
+SELECT discount_amount, discount_type 
+        FROM discount
+        WHERE discount_code = 'NA';
+
+SELECT f1.economy_seat_left AS f1_seatLeft, f2.economy_seat_left AS f2_seatLeft
+            FROM flight AS f1, flight AS f2
+            WHERE f1.flight_id = 2 AND f2.flight_id = -1
+            GROUP BY f1_seatLeft, f2_seatLeft
+            HAVING f1.economy_seat_left > 0 AND f2.economy_seat_left > 0;
+
+SELECT position
+            FROM waitlist
+            WHERE position <= 5 AND is_waitlisted = 'TRUE'
+            ORDER BY position ASC;
+
+SELECT 
+            FROM customer
+            WHERE ssn = 'will';
+
+SELECT *
+            FROM flight
+            WHERE flight_id = '3';
+
+SELECT *
+            FROM flight
+            WHERE flight_id = '-1';
+
+SELECT discount_code
+            FROM discount
+            WHERE discount_code = 'NA';
+
+SELECT base_ticket_cost 
+        FROM flight
+        WHERE flight_id = 3;
+
+SELECT base_ticket_cost 
+        FROM flight
+        WHERE flight_id = -1;
+
+SELECT discount_amount, discount_type 
+        FROM discount
+        WHERE discount_code = 'NA';
+
+SELECT f1.economy_seat_left AS f1_seatLeft, f2.economy_seat_left AS f2_seatLeft
+            FROM flight AS f1, flight AS f2
+            WHERE f1.flight_id = 3 AND f2.flight_id = -1
+            GROUP BY f1_seatLeft, f2_seatLeft
+            HAVING f1.economy_seat_left > 0 AND f2.economy_seat_left > 0;
+
+SELECT position
+            FROM waitlist
+            WHERE position <= 6 AND is_waitlisted = 'TRUE'
+            ORDER BY position ASC;
+
+SELECT ssn 
+        FROM customer
+        WHERE ssn = 'will';
+
+SELECT 
+            FROM customer
+            WHERE ssn = 'will';
+
+SELECT *
+            FROM flight
+            WHERE flight_id = '3';
+
+SELECT *
+            FROM flight
+            WHERE flight_id = '-1';
+
+SELECT discount_code
+            FROM discount
+            WHERE discount_code = 'NA';
+
+SELECT base_ticket_cost 
+        FROM flight
+        WHERE flight_id = 3;
+
+SELECT base_ticket_cost 
+        FROM flight
+        WHERE flight_id = -1;
+
+SELECT discount_amount, discount_type 
+        FROM discount
+        WHERE discount_code = 'NA';
+
+SELECT f1.economy_seat_left AS f1_seatLeft, f2.economy_seat_left AS f2_seatLeft
+            FROM flight AS f1, flight AS f2
+            WHERE f1.flight_id = 3 AND f2.flight_id = -1
+            GROUP BY f1_seatLeft, f2_seatLeft
+            HAVING f1.economy_seat_left > 0 AND f2.economy_seat_left > 0;
+
+SELECT 
+            FROM customer
+            WHERE ssn = 'will';
+
+SELECT *
+            FROM flight
+            WHERE flight_id = '3';
+
+SELECT *
+            FROM flight
+            WHERE flight_id = '-1';
+
+SELECT discount_code
+            FROM discount
+            WHERE discount_code = 'NA';
+
+SELECT base_ticket_cost 
+        FROM flight
+        WHERE flight_id = -1;
+
+SELECT base_ticket_cost 
+        FROM flight
+        WHERE flight_id = 3;
+
+SELECT discount_amount, discount_type 
+        FROM discount
+        WHERE discount_code = 'NA';
+
+SELECT f1.economy_seat_left AS f1_seatLeft, f2.economy_seat_left AS f2_seatLeft
+            FROM flight AS f1, flight AS f2
+            WHERE f1.flight_id = 3 AND f2.flight_id = -1
+            GROUP BY f1_seatLeft, f2_seatLeft
+            HAVING f1.economy_seat_left > 0 AND f2.economy_seat_left > 0;
+
+SELECT 
+            FROM customer
+            WHERE ssn = 'will';
+
+SELECT *
+            FROM flight
+            WHERE flight_id = '3';
+
+SELECT *
+            FROM flight
+            WHERE flight_id = '-1';
+
+SELECT discount_code
+            FROM discount
+            WHERE discount_code = 'NA';
+
+SELECT base_ticket_cost 
+        FROM flight
+        WHERE flight_id = 3;
+
+SELECT base_ticket_cost 
+        FROM flight
+        WHERE flight_id = -1;
+
+SELECT discount_amount, discount_type 
+        FROM discount
+        WHERE discount_code = 'NA';
+
+SELECT f1.first_class_seat_left AS f1_seatLeft, f2.first_class_seat_left AS f2_seatLeft
+            FROM flight AS f1, flight AS f2
+            WHERE f1.flight_id = 3 AND f2.flight_id = -1
+            GROUP BY f1_seatLeft, f2_seatLeft
+            HAVING f1.first_class_seat_left > 0 AND f2.first_class_seat_left > 0;
+
+SELECT position
+            FROM waitlist
+            WHERE position <= 1 AND is_waitlisted = 'TRUE'
+            ORDER BY position ASC;
+
+SELECT 
+            FROM customer
+            WHERE ssn = 'will';
+
+SELECT *
+            FROM flight
+            WHERE flight_id = '1';
+
+SELECT *
+            FROM flight
+            WHERE flight_id = '-1';
+
+SELECT discount_code
+            FROM discount
+            WHERE discount_code = 'NA';
+
+SELECT base_ticket_cost 
+        FROM flight
+        WHERE flight_id = -1;
+
+SELECT base_ticket_cost 
+        FROM flight
+        WHERE flight_id = 1;
+
+SELECT discount_amount, discount_type 
+        FROM discount
+        WHERE discount_code = 'NA';
+
+SELECT 
+            FROM customer
+            WHERE ssn = 'will';
+
+SELECT *
+            FROM flight
+            WHERE flight_id = '1';
+
+SELECT *
+            FROM flight
+            WHERE flight_id = '-1';
+
+SELECT discount_code
+            FROM discount
+            WHERE discount_code = 'NA';
+
+SELECT base_ticket_cost 
+        FROM flight
+        WHERE flight_id = 1;
+
+SELECT base_ticket_cost 
+        FROM flight
+        WHERE flight_id = -1;
+
+SELECT discount_amount, discount_type 
+        FROM discount
+        WHERE discount_code = 'NA';
+

@@ -559,7 +559,7 @@ app.post('/cancelticket', async function (req, res) {
                     
                     END TRANSACTION;`
                 );
-                fs.appendFile("query.sql",
+                fs.appendFile("transaction.sql",
                 `BEGIN TRANSACTION;  
     
                 UPDATE payment 
@@ -597,7 +597,7 @@ app.post('/cancelticket', async function (req, res) {
 
                     END TRANSACTION;`
                 )
-                fs.appendFile("query.sql",
+                fs.appendFile("transaction.sql",
                 `BEGIN TRANSACTION;
                     
                 UPDATE payment 

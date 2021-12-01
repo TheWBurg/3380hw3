@@ -4,6 +4,7 @@ dbs007
 
 Installations
 This team’s web application used the following installations:
+run the following commands in the console
 -npm install node
 -npm install node-fetch
 -npm install cors

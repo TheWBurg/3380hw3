@@ -89,16 +89,16 @@ app.post('/searchFlight', async function (req, res) {
     try {
         q = await pool.query(
             `SELECT * FROM flight WHERE 
-            departure_airport_id = (SELECT airport_id FROM airport WHERE airport_city = '${f.departureAirport}')
+            departure_airport_id IN (SELECT airport_id FROM airport WHERE airport_city = '${f.departureAirport}')
             AND 
-            arrival_airport_id = (SELECT airport_id FROM airport WHERE airport_city = '${f.arrivalAirport}');`
+            arrival_airport_id IN (SELECT airport_id FROM airport WHERE airport_city = '${f.arrivalAirport}');`
         );
         //dumping to query.sql
         fs.appendFile("query.sql",
         `SELECT * FROM flight WHERE 
-        departure_airport_id = (SELECT airport_id FROM airport WHERE airport_city = '${f.departureAirport}')
+        departure_airport_id IN (SELECT airport_id FROM airport WHERE airport_city = '${f.departureAirport}')
         AND 
-        arrival_airport_id = (SELECT airport_id FROM airport WHERE airport_city = '${f.arrivalAirport}');\n\n`, 
+        arrival_airport_id IN (SELECT airport_id FROM airport WHERE airport_city = '${f.arrivalAirport}');\n\n`, 
         function(err){
             if (err) throw err;
         });

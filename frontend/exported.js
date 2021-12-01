@@ -489,8 +489,11 @@ const checkTicketStatus = async(ev) => {
         document.getElementById('checkStatusResults').innerText = "User Name and Ticket Number are required. \n Please try again."
     } else if (await ticketExists(thisTicket) === false) {
         document.getElementById('checkStatusResults').innerText = "A ticket with this Ticket Number and SSN does not exist. \n Please try again."
+        document.getElementById('boardingPass1').innerText = "no tickets";
+        document.getElementById('boardingPass2').innerText = "no tickets";
     } else {
         let res = await getTicketDetails(thisTicket)
+        document.getElementById('checkStatusResults').innerText = ""
         //
         try{
             //editing the table in inputForm.html

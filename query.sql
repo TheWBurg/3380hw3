@@ -980,3 +980,67 @@ SELECT *
         FROM PAYMENT
         WHERE ticket_no = 1 AND is_cancelled = FALSE;
 
+SELECT class_type
+            FROM boarding_pass
+            WHERE ticket_no = 1;
+
+SELECT ticket_no, ssn
+        FROM payment
+        WHERE ticket_no = 1 AND ssn = '2';
+
+SELECT *
+        FROM PAYMENT
+        WHERE ticket_no = 1 AND is_cancelled = FALSE;
+
+SELECT ticket_no, ssn
+        FROM payment
+        WHERE ticket_no = 2 AND ssn = '2';
+
+SELECT class_type
+            FROM boarding_pass
+            WHERE ticket_no = 2;
+
+SELECT class_type
+            FROM boarding_pass
+            WHERE ticket_no = 2;
+
+SELECT ticket_no, ssn
+        FROM payment
+        WHERE ticket_no = 2 AND ssn = '2';
+
+SELECT ticket_no, ssn
+        FROM payment
+        WHERE ticket_no = 2 AND ssn = '2';
+
+SELECT class_type
+            FROM boarding_pass
+            WHERE ticket_no = 2;
+
+SELECT class_type
+            FROM boarding_pass
+            WHERE ticket_no = 2;
+
+SELECT ticket_no, ssn
+        FROM payment
+        WHERE ticket_no = 2 AND ssn = '2';
+
+SELECT class_type
+            FROM boarding_pass
+            WHERE ticket_no = 2;
+
+SELECT ticket_no, ssn
+        FROM payment
+        WHERE ticket_no = 2 AND ssn = '2';
+
+SELECT class_type
+            FROM boarding_pass
+            WHERE ticket_no = 2;
+
+SELECT ticket_no, ssn
+        FROM payment
+        WHERE ticket_no = 2 AND ssn = '2';
+
+SELECT ticket_no, ssn
+        FROM payment
+        WHERE ticket_no = 2 AND ssn = '2';
+

@@ -454,7 +454,7 @@ const cancelTicket = async(ev) => {
 
     if (validTicketDetails(thisTicket) === false) {
         document.getElementById('checkCancelResults').innerText = "SSN and Ticket Number are required. \n Please try again."
-    } else if (ticketExists(thisTicket) === false) {
+    } else if (await ticketExists(thisTicket) === false) {
         document.getElementById('checkCancelResults').innerText = "A ticket with this Ticket Number and SSN does not exist. \n Please try again."
     } else {
         let thisClassType = await getClassType(thisTicket)
@@ -487,7 +487,7 @@ const checkTicketStatus = async(ev) => {
     
     if (validTicketDetails(thisTicket) === false) {
         document.getElementById('checkStatusResults').innerText = "SSN and Ticket Number are required. \n Please try again."
-    } else if (ticketExists(thisTicket) === false) {
+    } else if (await ticketExists(thisTicket) === false) {
         document.getElementById('checkStatusResults').innerText = "A ticket with this Ticket Number and SSN does not exist. \n Please try again."
     } else {
         let res = await getTicketDetails(thisTicket)

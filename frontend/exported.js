@@ -497,6 +497,7 @@ const checkTicketStatus = async(ev) => {
             let flightInfoPush = "";
             if(res == 0){
                 document.getElementById('boardingPass1').innerText = "no tickets";
+                document.getElementById('boardingPass2').innerText = "no tickets";
             }
             else if(res[0].is_cancelled === true){
                 document.getElementById('boardingPass1').innerText = "cancelled";

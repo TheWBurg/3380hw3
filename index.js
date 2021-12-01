@@ -195,8 +195,8 @@ app.post('/saveTicketInfo', async function (req, res) {
         VALUES (${t[i].flightID}, ${t[i].flightID2}, '${t[i].classType}', ${t[i].numBags}, 'FALSE')
         RETURNING ticket_no)
     
-        INSERT INTO payment (ticket_no, ssn, credit_card_num, taxes, discount_code, final_price, flight_id, flight_id_2, is_cancelled)
-        VALUES ((SELECT ticket_no FROM ins${i}), '${t[i].ssn}', '${t[i].creditCardNum}', 'NA', '${t[i].discountCode}', ${t[i].totalCost}, ${t[i].flightID}, ${t[i].flightID2}, FALSE);
+        INSERT INTO payment (ticket_no, ssn, credit_card_num, taxes, discount_code, final_price, is_cancelled)
+        VALUES ((SELECT ticket_no FROM ins${i}), '${t[i].ssn}', '${t[i].creditCardNum}', 'NA', '${t[i].discountCode}', ${t[i].totalCost}, FALSE);
 
         INSERT INTO boughtTicks(ticketNo, finalPrice, ssn, flightID, flightID2)
         values ((SELECT ticket_no FROM payment ORDER BY ticket_no DESC limit 1), ${t[i].totalCost}, ${t[i].ssn}, ${t[i].flightID}, ${t[i].flightID2});
@@ -814,8 +814,8 @@ app.post('/saveWaitListInfo', async function (req, res) {
                 VALUES (${w.flightID}, ${w.flightID2}, '${w.classType}', ${w.numBags}, 'TRUE')
                 RETURNING ticket_no)
             
-                INSERT INTO payment (ticket_no, ssn, credit_card_num, taxes, discount_code, final_price, flight_id, flight_id_2, is_cancelled)
-                VALUES ((SELECT ticket_no FROM ins0), '${w.ssn}', '${w.creditCardNum}', 'NA', '${w.discountCode}', ${w.totalCost}, ${w.flightID}, ${w.flightID2}, FALSE);
+                INSERT INTO payment (ticket_no, ssn, credit_card_num, taxes, discount_code, final_price, is_cancelled)
+                VALUES ((SELECT ticket_no FROM ins0), '${w.ssn}', '${w.creditCardNum}', 'NA', '${w.discountCode}', ${w.totalCost}, FALSE);
     
                 INSERT INTO waitlist (waitlist_id, ssn, flight_id, flight_id_2, is_waitlisted)
                 VALUES ((SELECT ticket_no FROM payment ORDER BY payment DESC limit 1), ${w.ssn}, ${w.flightID}, ${w.flightID2}, 'TRUE');
@@ -840,8 +840,8 @@ app.post('/saveWaitListInfo', async function (req, res) {
             VALUES (${w.flightID}, ${w.flightID2}, '${w.classType}', ${w.numBags}, 'TRUE')
             RETURNING ticket_no)
         
-            INSERT INTO payment (ticket_no, ssn, credit_card_num, taxes, discount_code, final_price, flight_id, flight_id_2, is_cancelled)
-            VALUES ((SELECT ticket_no FROM ins0), '${w.ssn}', '${w.creditCardNum}', 'NA', '${w.discountCode}', ${w.totalCost}, ${w.flightID}, ${w.flightID2}, FALSE);
+            INSERT INTO payment (ticket_no, ssn, credit_card_num, taxes, discount_code, final_price, is_cancelled)
+            VALUES ((SELECT ticket_no FROM ins0), '${w.ssn}', '${w.creditCardNum}', 'NA', '${w.discountCode}', ${w.totalCost}, FALSE);
 
             INSERT INTO waitlist (waitlist_id, ssn, flight_id, flight_id_2, is_waitlisted)
             VALUES ((SELECT ticket_no FROM payment ORDER BY payment DESC limit 1), ${w.ssn}, ${w.flightID}, ${w.flightID2}, 'TRUE');

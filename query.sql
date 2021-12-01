@@ -869,3 +869,114 @@ SELECT position
             WHERE position <= 18 AND is_waitlisted = 'TRUE'
             ORDER BY position ASC;
 
+SELECT 
+            FROM customer
+            WHERE ssn = '1';
+
+SELECT *
+            FROM flight
+            WHERE flight_id = '1234';
+
+SELECT *
+            FROM flight
+            WHERE flight_id = '-1';
+
+SELECT discount_code
+            FROM discount
+            WHERE discount_code = 'NA';
+
+SELECT 
+            FROM customer
+            WHERE ssn = '1';
+
+SELECT *
+            FROM flight
+            WHERE flight_id = '1';
+
+SELECT *
+            FROM flight
+            WHERE flight_id = '-1';
+
+SELECT discount_code
+            FROM discount
+            WHERE discount_code = 'NA';
+
+SELECT ssn 
+        FROM customer
+        WHERE ssn = '1';
+
+SELECT ssn 
+        FROM customer
+        WHERE ssn = '2';
+
+SELECT ssn 
+        FROM customer
+        WHERE ssn = '';
+
+SELECT ssn 
+        FROM customer
+        WHERE ssn = '3';
+
+SELECT ssn 
+        FROM customer
+        WHERE ssn = '5';
+
+SELECT 
+            FROM customer
+            WHERE ssn = '2';
+
+SELECT *
+            FROM flight
+            WHERE flight_id = '2';
+
+SELECT *
+            FROM flight
+            WHERE flight_id = '-1';
+
+SELECT discount_code
+            FROM discount
+            WHERE discount_code = 'NA';
+
+SELECT base_ticket_cost 
+        FROM flight
+        WHERE flight_id = -1;
+
+SELECT base_ticket_cost 
+        FROM flight
+        WHERE flight_id = 2;
+
+SELECT discount_amount, discount_type 
+        FROM discount
+        WHERE discount_code = 'NA';
+
+SELECT f1.first_class_seat_left AS f1_seatLeft, f2.first_class_seat_left AS f2_seatLeft
+            FROM flight AS f1, flight AS f2
+            WHERE f1.flight_id = 2 AND f2.flight_id = -1
+            GROUP BY f1_seatLeft, f2_seatLeft
+            HAVING f1.first_class_seat_left > 0 AND f2.first_class_seat_left > 0;
+
+SELECT position
+            FROM waitlist
+            WHERE position <= 1 AND is_waitlisted = 'TRUE'
+            ORDER BY position ASC;
+
+SELECT ticket_no, ssn
+        FROM payment
+        WHERE ticket_no = 2 AND ssn = '2';
+
+SELECT class_type
+            FROM boarding_pass
+            WHERE ticket_no = 2;
+
+SELECT ticket_no, ssn
+        FROM payment
+        WHERE ticket_no = 1 AND ssn = '2';
+
+SELECT class_type
+            FROM boarding_pass
+            WHERE ticket_no = 1;
+
+SELECT *
+        FROM PAYMENT
+        WHERE ticket_no = 1 AND is_cancelled = FALSE;
+

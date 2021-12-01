@@ -2742,3 +2742,455 @@ SELECT position
             AND flight_id = 2 AND flight_id_2 = -1
             ORDER BY position ASC;
 
+SELECT 
+            FROM customer
+            WHERE ssn = 'will';
+
+SELECT *
+            FROM flight
+            WHERE flight_id = '1';
+
+SELECT *
+            FROM flight
+            WHERE flight_id = '2';
+
+SELECT discount_code
+            FROM discount
+            WHERE discount_code = 'NA';
+
+SELECT airport_city
+            FROM airport 
+            WHERE airport_id = (SELECT departure_airport_id FROM flight WHERE flight_id = 1)
+
+SELECT airport_city
+            FROM airport 
+            WHERE airport_id = (SELECT departure_airport_id FROM flight WHERE flight_id = 2);
+
+SELECT base_ticket_cost 
+        FROM flight
+        WHERE flight_id = 2;
+
+SELECT base_ticket_cost 
+        FROM flight
+        WHERE flight_id = 1;
+
+SELECT discount_amount, discount_type 
+        FROM discount
+        WHERE discount_code = 'NA';
+
+SELECT 
+            FROM customer
+            WHERE ssn = 'will';
+
+SELECT *
+            FROM flight
+            WHERE flight_id = '1';
+
+SELECT *
+            FROM flight
+            WHERE flight_id = '2';
+
+SELECT discount_code
+            FROM discount
+            WHERE discount_code = 'NA';
+
+SELECT airport_city
+            FROM airport 
+            WHERE airport_id = (SELECT departure_airport_id FROM flight WHERE flight_id = 1)
+
+SELECT airport_city
+            FROM airport 
+            WHERE airport_id = (SELECT departure_airport_id FROM flight WHERE flight_id = 2);
+
+SELECT 
+            FROM customer
+            WHERE ssn = 'will';
+
+SELECT *
+            FROM flight
+            WHERE flight_id = '6';
+
+SELECT *
+            FROM flight
+            WHERE flight_id = '7';
+
+SELECT discount_code
+            FROM discount
+            WHERE discount_code = 'NA';
+
+SELECT airport_city
+            FROM airport 
+            WHERE airport_id = (SELECT departure_airport_id FROM flight WHERE flight_id = 6)
+
+SELECT airport_city
+            FROM airport 
+            WHERE airport_id = (SELECT departure_airport_id FROM flight WHERE flight_id = 7);
+
+SELECT t1.flight_id AS flight_id1, t2.flight_id AS flight_id2, t1.departure_airport_id, t1.arrival_airport_id AS layover_airport_id, t2.arrival_airport_id AS destination_airport_id, 
+            t1.sch_departure_time, t1.sch_arrival_time AS layover_arrival_time, t2.sch_departure_time AS layover_departure_time, t2.sch_arrival_time AS destination_arrival_time,
+            t1.economy_seat_left AS t1_econ, t2.economy_seat_left AS t2_econ, t1.business_seat_left AS t1_bus, t2.business_seat_left AS t2_bus, t1.first_class_seat_left AS t1_first, 
+            t2.first_class_seat_left AS t2_first
+
+            FROM flight AS t1
+
+            INNER JOIN flight AS t2 ON t2.departure_airport_id = t1.arrival_airport_id
+
+            WHERE t1.departure_airport_id = (SELECT airport_id FROM airport WHERE airport_city = 'Austin')
+            AND
+            t2.arrival_airport_id = (SELECT airport_id FROM airport WHERE airport_city = 'Dallas')
+            AND 
+            t1.sch_arrival_time < t2.sch_departure_time
+            AND t1.flight_id = 6 AND t2.flight_id = 7;
+
+SELECT base_ticket_cost 
+        FROM flight
+        WHERE flight_id = 1;
+
+SELECT base_ticket_cost 
+        FROM flight
+        WHERE flight_id = 2;
+
+SELECT discount_amount, discount_type 
+        FROM discount
+        WHERE discount_code = 'NA';
+
+SELECT base_ticket_cost 
+        FROM flight
+        WHERE flight_id = 7;
+
+SELECT base_ticket_cost 
+        FROM flight
+        WHERE flight_id = 6;
+
+SELECT discount_amount, discount_type 
+        FROM discount
+        WHERE discount_code = 'NA';
+
+SELECT 
+            FROM customer
+            WHERE ssn = 'will';
+
+SELECT *
+            FROM flight
+            WHERE flight_id = '6';
+
+SELECT *
+            FROM flight
+            WHERE flight_id = '7';
+
+SELECT discount_code
+            FROM discount
+            WHERE discount_code = 'NA';
+
+SELECT airport_city
+            FROM airport 
+            WHERE airport_id = (SELECT departure_airport_id FROM flight WHERE flight_id = 6)
+
+SELECT airport_city
+            FROM airport 
+            WHERE airport_id = (SELECT departure_airport_id FROM flight WHERE flight_id = 7);
+
+SELECT t1.flight_id AS flight_id1, t2.flight_id AS flight_id2, t1.departure_airport_id, t1.arrival_airport_id AS layover_airport_id, t2.arrival_airport_id AS destination_airport_id, 
+            t1.sch_departure_time, t1.sch_arrival_time AS layover_arrival_time, t2.sch_departure_time AS layover_departure_time, t2.sch_arrival_time AS destination_arrival_time,
+            t1.economy_seat_left AS t1_econ, t2.economy_seat_left AS t2_econ, t1.business_seat_left AS t1_bus, t2.business_seat_left AS t2_bus, t1.first_class_seat_left AS t1_first, 
+            t2.first_class_seat_left AS t2_first
+
+            FROM flight AS t1
+
+            INNER JOIN flight AS t2 ON t2.departure_airport_id = t1.arrival_airport_id
+
+            WHERE t1.departure_airport_id = (SELECT airport_id FROM airport WHERE airport_city = 'Austin')
+            AND
+            t2.arrival_airport_id = (SELECT airport_id FROM airport WHERE airport_city = 'Dallas')
+            AND 
+            t1.sch_arrival_time < t2.sch_departure_time
+            AND t1.flight_id = 6 AND t2.flight_id = 7;
+
+SELECT base_ticket_cost 
+        FROM flight
+        WHERE flight_id = 6;
+
+SELECT base_ticket_cost 
+        FROM flight
+        WHERE flight_id = 7;
+
+SELECT discount_amount, discount_type 
+        FROM discount
+        WHERE discount_code = 'NA';
+
+SELECT 
+            FROM customer
+            WHERE ssn = 'will';
+
+SELECT *
+            FROM flight
+            WHERE flight_id = '6';
+
+SELECT *
+            FROM flight
+            WHERE flight_id = '7';
+
+SELECT discount_code
+            FROM discount
+            WHERE discount_code = 'NA';
+
+SELECT airport_city
+            FROM airport 
+            WHERE airport_id = (SELECT departure_airport_id FROM flight WHERE flight_id = 6)
+
+SELECT airport_city
+            FROM airport 
+            WHERE airport_id = (SELECT departure_airport_id FROM flight WHERE flight_id = 7);
+
+SELECT t1.flight_id AS flight_id1, t2.flight_id AS flight_id2, t1.departure_airport_id, t1.arrival_airport_id AS layover_airport_id, t2.arrival_airport_id AS destination_airport_id, 
+            t1.sch_departure_time, t1.sch_arrival_time AS layover_arrival_time, t2.sch_departure_time AS layover_departure_time, t2.sch_arrival_time AS destination_arrival_time,
+            t1.economy_seat_left AS t1_econ, t2.economy_seat_left AS t2_econ, t1.business_seat_left AS t1_bus, t2.business_seat_left AS t2_bus, t1.first_class_seat_left AS t1_first, 
+            t2.first_class_seat_left AS t2_first
+
+            FROM flight AS t1
+
+            INNER JOIN flight AS t2 ON t2.departure_airport_id = t1.arrival_airport_id
+
+            WHERE t1.departure_airport_id = (SELECT airport_id FROM airport WHERE airport_city = 'Austin')
+            AND
+            t2.arrival_airport_id = (SELECT airport_id FROM airport WHERE airport_city = 'Dallas')
+            AND 
+            t1.sch_arrival_time < t2.sch_departure_time
+            AND t1.flight_id = 6 AND t2.flight_id = 7;
+
+SELECT base_ticket_cost 
+        FROM flight
+        WHERE flight_id = 6;
+
+SELECT base_ticket_cost 
+        FROM flight
+        WHERE flight_id = 7;
+
+SELECT discount_amount, discount_type 
+        FROM discount
+        WHERE discount_code = 'NA';
+
+SELECT 
+            FROM customer
+            WHERE ssn = 'will';
+
+SELECT *
+            FROM flight
+            WHERE flight_id = '6';
+
+SELECT *
+            FROM flight
+            WHERE flight_id = '7';
+
+SELECT discount_code
+            FROM discount
+            WHERE discount_code = 'NA';
+
+SELECT airport_city
+            FROM airport 
+            WHERE airport_id = (SELECT departure_airport_id FROM flight WHERE flight_id = 6)
+
+SELECT airport_city
+            FROM airport 
+            WHERE airport_id = (SELECT departure_airport_id FROM flight WHERE flight_id = 7);
+
+SELECT t1.flight_id AS flight_id1, t2.flight_id AS flight_id2, t1.departure_airport_id, t1.arrival_airport_id AS layover_airport_id, t2.arrival_airport_id AS destination_airport_id, 
+            t1.sch_departure_time, t1.sch_arrival_time AS layover_arrival_time, t2.sch_departure_time AS layover_departure_time, t2.sch_arrival_time AS destination_arrival_time,
+            t1.economy_seat_left AS t1_econ, t2.economy_seat_left AS t2_econ, t1.business_seat_left AS t1_bus, t2.business_seat_left AS t2_bus, t1.first_class_seat_left AS t1_first, 
+            t2.first_class_seat_left AS t2_first
+
+            FROM flight AS t1
+
+            INNER JOIN flight AS t2 ON t2.departure_airport_id = t1.arrival_airport_id
+
+            WHERE t1.departure_airport_id = (SELECT airport_id FROM airport WHERE airport_city = 'Austin')
+            AND
+            t2.arrival_airport_id = (SELECT airport_id FROM airport WHERE airport_city = 'Dallas')
+            AND 
+            t1.sch_arrival_time < t2.sch_departure_time
+            AND t1.flight_id = 6 AND t2.flight_id = 7;
+
+SELECT base_ticket_cost 
+        FROM flight
+        WHERE flight_id = 7;
+
+SELECT base_ticket_cost 
+        FROM flight
+        WHERE flight_id = 6;
+
+SELECT discount_amount, discount_type 
+        FROM discount
+        WHERE discount_code = 'NA';
+
+SELECT 
+            FROM customer
+            WHERE ssn = 'will';
+
+SELECT *
+            FROM flight
+            WHERE flight_id = '3';
+
+SELECT *
+            FROM flight
+            WHERE flight_id = '4';
+
+SELECT discount_code
+            FROM discount
+            WHERE discount_code = 'NA';
+
+SELECT airport_city
+            FROM airport 
+            WHERE airport_id = (SELECT departure_airport_id FROM flight WHERE flight_id = 3)
+
+SELECT airport_city
+            FROM airport 
+            WHERE airport_id = (SELECT departure_airport_id FROM flight WHERE flight_id = 4);
+
+SELECT t1.flight_id AS flight_id1, t2.flight_id AS flight_id2, t1.departure_airport_id, t1.arrival_airport_id AS layover_airport_id, t2.arrival_airport_id AS destination_airport_id, 
+            t1.sch_departure_time, t1.sch_arrival_time AS layover_arrival_time, t2.sch_departure_time AS layover_departure_time, t2.sch_arrival_time AS destination_arrival_time,
+            t1.economy_seat_left AS t1_econ, t2.economy_seat_left AS t2_econ, t1.business_seat_left AS t1_bus, t2.business_seat_left AS t2_bus, t1.first_class_seat_left AS t1_first, 
+            t2.first_class_seat_left AS t2_first
+
+            FROM flight AS t1
+
+            INNER JOIN flight AS t2 ON t2.departure_airport_id = t1.arrival_airport_id
+
+            WHERE t1.departure_airport_id = (SELECT airport_id FROM airport WHERE airport_city = 'Denver')
+            AND
+            t2.arrival_airport_id = (SELECT airport_id FROM airport WHERE airport_city = 'Dallas')
+            AND 
+            t1.sch_arrival_time < t2.sch_departure_time
+            AND t1.flight_id = 3 AND t2.flight_id = 4;
+
+SELECT 
+            FROM customer
+            WHERE ssn = 'will';
+
+SELECT *
+            FROM flight
+            WHERE flight_id = '6';
+
+SELECT *
+            FROM flight
+            WHERE flight_id = '7';
+
+SELECT discount_code
+            FROM discount
+            WHERE discount_code = 'NA';
+
+SELECT airport_city
+            FROM airport 
+            WHERE airport_id = (SELECT departure_airport_id FROM flight WHERE flight_id = 6)
+
+SELECT airport_city
+            FROM airport 
+            WHERE airport_id = (SELECT departure_airport_id FROM flight WHERE flight_id = 7);
+
+SELECT t1.flight_id AS flight_id1, t2.flight_id AS flight_id2, t1.departure_airport_id, t1.arrival_airport_id AS layover_airport_id, t2.arrival_airport_id AS destination_airport_id, 
+            t1.sch_departure_time, t1.sch_arrival_time AS layover_arrival_time, t2.sch_departure_time AS layover_departure_time, t2.sch_arrival_time AS destination_arrival_time,
+            t1.economy_seat_left AS t1_econ, t2.economy_seat_left AS t2_econ, t1.business_seat_left AS t1_bus, t2.business_seat_left AS t2_bus, t1.first_class_seat_left AS t1_first, 
+            t2.first_class_seat_left AS t2_first
+
+            FROM flight AS t1
+
+            INNER JOIN flight AS t2 ON t2.departure_airport_id = t1.arrival_airport_id
+
+            WHERE t1.departure_airport_id = (SELECT airport_id FROM airport WHERE airport_city = 'Austin')
+            AND
+            t2.arrival_airport_id = (SELECT airport_id FROM airport WHERE airport_city = 'Dallas')
+            AND 
+            t1.sch_arrival_time < t2.sch_departure_time
+            AND t1.flight_id = 6 AND t2.flight_id = 7;
+
+SELECT base_ticket_cost 
+        FROM flight
+        WHERE flight_id = 6;
+
+SELECT base_ticket_cost 
+        FROM flight
+        WHERE flight_id = 7;
+
+SELECT discount_amount, discount_type 
+        FROM discount
+        WHERE discount_code = 'NA';
+
+SELECT 
+            FROM customer
+            WHERE ssn = 'will';
+
+SELECT *
+            FROM flight
+            WHERE flight_id = '11';
+
+SELECT *
+            FROM flight
+            WHERE flight_id = '12';
+
+SELECT discount_code
+            FROM discount
+            WHERE discount_code = 'NA';
+
+SELECT airport_city
+            FROM airport 
+            WHERE airport_id = (SELECT departure_airport_id FROM flight WHERE flight_id = 11)
+
+SELECT airport_city
+            FROM airport 
+            WHERE airport_id = (SELECT departure_airport_id FROM flight WHERE flight_id = 12);
+
+SELECT t1.flight_id AS flight_id1, t2.flight_id AS flight_id2, t1.departure_airport_id, t1.arrival_airport_id AS layover_airport_id, t2.arrival_airport_id AS destination_airport_id, 
+            t1.sch_departure_time, t1.sch_arrival_time AS layover_arrival_time, t2.sch_departure_time AS layover_departure_time, t2.sch_arrival_time AS destination_arrival_time,
+            t1.economy_seat_left AS t1_econ, t2.economy_seat_left AS t2_econ, t1.business_seat_left AS t1_bus, t2.business_seat_left AS t2_bus, t1.first_class_seat_left AS t1_first, 
+            t2.first_class_seat_left AS t2_first
+
+            FROM flight AS t1
+
+            INNER JOIN flight AS t2 ON t2.departure_airport_id = t1.arrival_airport_id
+
+            WHERE t1.departure_airport_id = (SELECT airport_id FROM airport WHERE airport_city = 'New York')
+            AND
+            t2.arrival_airport_id = (SELECT airport_id FROM airport WHERE airport_city = 'Denver')
+            AND 
+            t1.sch_arrival_time < t2.sch_departure_time
+            AND t1.flight_id = 11 AND t2.flight_id = 12;
+
+SELECT 
+            FROM customer
+            WHERE ssn = 'will';
+
+SELECT *
+            FROM flight
+            WHERE flight_id = '1';
+
+SELECT *
+            FROM flight
+            WHERE flight_id = '2';
+
+SELECT discount_code
+            FROM discount
+            WHERE discount_code = 'NA';
+
+SELECT airport_city
+            FROM airport 
+            WHERE airport_id = (SELECT departure_airport_id FROM flight WHERE flight_id = 1)
+
+SELECT airport_city
+            FROM airport 
+            WHERE airport_id = (SELECT departure_airport_id FROM flight WHERE flight_id = 2);
+
+SELECT t1.flight_id AS flight_id1, t2.flight_id AS flight_id2, t1.departure_airport_id, t1.arrival_airport_id AS layover_airport_id, t2.arrival_airport_id AS destination_airport_id, 
+            t1.sch_departure_time, t1.sch_arrival_time AS layover_arrival_time, t2.sch_departure_time AS layover_departure_time, t2.sch_arrival_time AS destination_arrival_time,
+            t1.economy_seat_left AS t1_econ, t2.economy_seat_left AS t2_econ, t1.business_seat_left AS t1_bus, t2.business_seat_left AS t2_bus, t1.first_class_seat_left AS t1_first, 
+            t2.first_class_seat_left AS t2_first
+
+            FROM flight AS t1
+
+            INNER JOIN flight AS t2 ON t2.departure_airport_id = t1.arrival_airport_id
+
+            WHERE t1.departure_airport_id = (SELECT airport_id FROM airport WHERE airport_city = 'Houston')
+            AND
+            t2.arrival_airport_id = (SELECT airport_id FROM airport WHERE airport_city = 'Dallas')
+            AND 
+            t1.sch_arrival_time < t2.sch_departure_time
+            AND t1.flight_id = 1 AND t2.flight_id = 2;
+

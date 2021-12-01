@@ -238,6 +238,7 @@ app.post('/saveTicketInfo', async function (req, res) {
     console.log(g.rows)
     console.log("Added valid ticket(s) to the database");
     res.json(g.rows);
+
     return
 });
 
@@ -1015,9 +1016,9 @@ app.post('/doesConnectingFlightExist', async function (req, res) {
 
             INNER JOIN flight AS t2 ON t2.departure_airport_id = t1.arrival_airport_id
 
-            WHERE t1.departure_airport_id = (SELECT airport_id FROM airport WHERE airport_city = '${r.rows[0].airport_city}')
+            WHERE t1.departure_airport_id IN (SELECT airport_id FROM airport WHERE airport_city = '${r.rows[0].airport_city}')
             AND
-            t2.arrival_airport_id = (SELECT airport_id FROM airport WHERE airport_city = '${s.rows[0].airport_city}')
+            t2.arrival_airport_id IN (SELECT airport_id FROM airport WHERE airport_city = '${s.rows[0].airport_city}')
             AND 
             t1.sch_arrival_time < t2.sch_departure_time
             AND t1.flight_id = ${f.flightID} AND t2.flight_id = ${f.flightID2};`
@@ -1032,9 +1033,9 @@ app.post('/doesConnectingFlightExist', async function (req, res) {
 
             INNER JOIN flight AS t2 ON t2.departure_airport_id = t1.arrival_airport_id
 
-            WHERE t1.departure_airport_id = (SELECT airport_id FROM airport WHERE airport_city = '${r.rows[0].airport_city}')
+            WHERE t1.departure_airport_id IN (SELECT airport_id FROM airport WHERE airport_city = '${r.rows[0].airport_city}')
             AND
-            t2.arrival_airport_id = (SELECT airport_id FROM airport WHERE airport_city = '${s.rows[0].airport_city}')
+            t2.arrival_airport_id IN (SELECT airport_id FROM airport WHERE airport_city = '${s.rows[0].airport_city}')
             AND 
             t1.sch_arrival_time < t2.sch_departure_time
             AND t1.flight_id = ${f.flightID} AND t2.flight_id = ${f.flightID2};\n\n`, 

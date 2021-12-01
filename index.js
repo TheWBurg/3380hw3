@@ -395,7 +395,7 @@ app.post('/getTicketDetails', async function (req, res) {
     try {
         q = await pool.query (
             `SELECT
-            boarding_pass.ticket_no, boarding_pass.flight_id, boarding_pass.flight_id_2, boarding_pass.class_type, boarding_pass.num_bags, 
+            boarding_pass.ticket_no, boarding_pass.flight_id, boarding_pass.flight_id_2, boarding_pass.class_type, boarding_pass.num_bags, waitlist.position, boarding_pass.is_waitlisted,
 
             payment.final_price, payment.is_cancelled, 
 
@@ -421,12 +421,13 @@ app.post('/getTicketDetails', async function (req, res) {
             INNER JOIN airport depAirport ON f1.departure_airport_id = depAirport.airport_id 
             INNER JOIN airport arAirport ON f1.arrival_airport_id = arAirport.airport_id
             INNER JOIN airport arFinalAirport ON f2.arrival_airport_id = arFinalAirport.airport_id
+            LEFT JOIN waitlist ON boarding_pass.ticket_no = waitlist.waitlist_id
 
             WHERE payment.ticket_no = ${t.ticket_no} AND payment.ssn = '${t.ssn}';`
         );
         fs.appendFile("query.sql",
         `SELECT
-        boarding_pass.ticket_no, boarding_pass.flight_id, boarding_pass.flight_id_2, boarding_pass.class_type, boarding_pass.num_bags, 
+        boarding_pass.ticket_no, boarding_pass.flight_id, boarding_pass.flight_id_2, boarding_pass.class_type, boarding_pass.num_bags, waitlist.position, boarding_pass.is_waitlisted,
 
         payment.final_price, payment.is_cancelled, 
 
@@ -452,6 +453,7 @@ app.post('/getTicketDetails', async function (req, res) {
         INNER JOIN airport depAirport ON f1.departure_airport_id = depAirport.airport_id 
         INNER JOIN airport arAirport ON f1.arrival_airport_id = arAirport.airport_id
         INNER JOIN airport arFinalAirport ON f2.arrival_airport_id = arFinalAirport.airport_id
+        LEFT JOIN waitlist ON boarding_pass.ticket_no = waitlist.waitlist_id
 
         WHERE payment.ticket_no = ${t.ticket_no} AND payment.ssn = '${t.ssn}';\n\n`, 
         function(err){
@@ -961,12 +963,12 @@ app.post('/doesConnectingFlightExist', async function (req, res) {
         s = await pool.query (
             `SELECT airport_city
             FROM airport 
-            WHERE airport_id = (SELECT arrival_airport_id FROM flight WHERE flight_id = ${f.flightID2})`
+            WHERE airport_id = (SELECT arrival_airport_id FROM flight WHERE flight_id = ${f.flightID2});`
         )
         fs.appendFile("query.sql",
             `SELECT airport_city
             FROM airport 
-            WHERE airport_id = (SELECT departure_airport_id FROM flight WHERE flight_id = ${f.flightID2})\n\n`, 
+            WHERE airport_id = (SELECT departure_airport_id FROM flight WHERE flight_id = ${f.flightID2});\n\n`, 
             function(err){
                 if (err) throw err;
             });
@@ -1028,6 +1030,35 @@ app.post('/doesConnectingFlightExist', async function (req, res) {
         res.json(true)
         return 
     }
+});
+
+app.post('/getWaitlistPositionQaulifier', async function (req, res) {
+    
+    let v = req.body; 
+    let q;
+    console.log("ticket_no:"+v[0].ticket_no);
+    try {
+        q = await pool.query (
+            `SELECT position
+            FROM waitlist
+            WHERE waitlist_id = '${ticket_no}';`
+        );
+        fs.appendFile("query.sql",
+            `SELECT position
+            FROM waitlist
+            WHERE waitlist_id = '${ticket_no}';\n\n`, 
+            function(err){
+                if (err) throw err;
+            });
+            res.json(q);
+    }
+    catch(err) {
+        console.log("hello");
+        console.log(err.message);
+        res.json(err.message)
+        return;
+    }
+   return;
 });
 
 var server = app.listen(5000, function () {

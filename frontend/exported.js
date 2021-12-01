@@ -1,4 +1,4 @@
-import {getDiscountInfo, saveCustomer, getFlightsDetails, getConnectedFlightDetails, saveTicketInfo, getTicketBasePrice, checkSSN, checkTicket, getTicketDetails, cancelThisTicket, getClassType, doesSsnExist, doesFlightIdExist, doesFlightId2Exist, saveWaitListInfo, getWaitListPosition, doesDiscountCodeExist, doesConnectingFlightExist} from "../test/databaseFunctions.js";
+import {getDiscountInfo,getWaitlistPositionQualifier, saveCustomer, getFlightsDetails, getConnectedFlightDetails, saveTicketInfo, getTicketBasePrice, checkSSN, checkTicket, getTicketDetails, cancelThisTicket, getClassType, doesSsnExist, doesFlightIdExist, doesFlightId2Exist, saveWaitListInfo, getWaitListPosition, doesDiscountCodeExist, doesConnectingFlightExist} from "../test/databaseFunctions.js";
 //import { getFlightsDetails } from "../test/databaseFunctions.js";
 //import from "../test/databaseFunctions.js";
 
@@ -518,6 +518,19 @@ const checkTicketStatus = async(ev) => {
                     </tr>`;
                 }   
                 boardingPass1.innerHTML = flightInfoPush;
+                
+                console.log(res);
+                if(res[0].is_waitlisted){
+                    //let waitlistPositionQualifier = []; 
+                    //waitlistPositionQualifier[0]= await getWaitlistPositionQualifier(res);
+                    //console.log(waitlistPositionQualifier[0]);
+                    let waitlistPosition = await getWaitListPosition(res)
+                    document.getElementById('waitlistPosition').innerText = `waitlist position: ${waitlistPosition}`;
+                }
+                else{
+                    document.getElementById('waitlistPosition').innerText = `waitlist position: not waitlisted`;
+                }
+                
     
                 //editing the table in inputForm.html
                 flightInfoPush = "";
@@ -542,12 +555,13 @@ const checkTicketStatus = async(ev) => {
                     boardingPass2.innerHTML = flightInfoPush;
                 }
                 
+                
             }
-        }
+    }
         catch(err){
             console.log(err.message);
         }
-        document.getElementById('checkStatusResults').innerText = JSON.stringify(res); 
+        //document.getElementById('checkStatusResults').innerText = JSON.stringify(res); 
         document.querySelector('form').reset();
     }
 

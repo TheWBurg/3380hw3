@@ -235,3 +235,15 @@ export async function doesConnectingFlightExist(flightInfo) {
     console.log(res)
     return res;
 }
+
+export async function getWaitlistPositionQualifier(info) {
+    const response = await fetch(`http://localhost:5000/getWaitlistPositionQualifier`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+            },
+        body: JSON.stringify(info)});
+    let res = await response.json()
+    console.log(res)
+    return res;
+}

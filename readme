@@ -14,3 +14,5 @@ TA example program
 https://github.com/tian1001tx/cosc3380
 string comparison in javascript
 https://pretagteam.com/question/check-if-string-contains-only-letters-in-javascript
+
+Changed SSN to User-Name on the front end. SSN in the database signifies User name for all intents and purposes.

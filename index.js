@@ -129,9 +129,9 @@ app.post('/searchConnectedFlight', async function (req, res) {
             t2.first_class_seat_left AS t2_first
             FROM flight AS t1
             INNER JOIN flight AS t2 ON t2.departure_airport_id = t1.arrival_airport_id
-            WHERE t1.departure_airport_id = (SELECT airport_id FROM airport WHERE airport_city = '${f.departureAirport}')
+            WHERE t1.departure_airport_id IN (SELECT airport_id FROM airport WHERE airport_city = '${f.departureAirport}')
             AND
-            t2.arrival_airport_id = (SELECT airport_id FROM airport WHERE airport_city = '${f.arrivalAirport}')
+            t2.arrival_airport_id IN (SELECT airport_id FROM airport WHERE airport_city = '${f.arrivalAirport}')
             AND 
             t1.sch_arrival_time < t2.sch_departure_time;
             `
@@ -145,9 +145,9 @@ app.post('/searchConnectedFlight', async function (req, res) {
             t2.first_class_seat_left AS t2_first
         FROM flight AS t1
         INNER JOIN flight AS t2 ON t2.departure_airport_id = t1.arrival_airport_id
-        WHERE t1.departure_airport_id = (SELECT airport_id FROM airport WHERE airport_city = '${f.departureAirport}')
+        WHERE t1.departure_airport_id IN (SELECT airport_id FROM airport WHERE airport_city = '${f.departureAirport}')
         AND
-        t2.arrival_airport_id = (SELECT airport_id FROM airport WHERE airport_city = '${f.arrivalAirport}')
+        t2.arrival_airport_id IN (SELECT airport_id FROM airport WHERE airport_city = '${f.arrivalAirport}')
         AND 
         t1.sch_arrival_time < t2.sch_departure_time;`,function(err){
             if (err) throw err;

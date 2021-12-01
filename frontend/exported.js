@@ -102,9 +102,9 @@ const addCustomer = async (ev)=> {
     //thisCustomer = validCustomerDetails(thisCustomer)
 
     if (isValidCustDetails === false) {
-        document.getElementById('resgiterCustomerResults').innerText = "SSN, First Name, and Last Name fields are required. \n Please try again."
+        document.getElementById('resgiterCustomerResults').innerText = "User Name, First Name, and Last Name fields are required. \n Please try again."
     } else if(doesSsnExist === true) {
-        document.getElementById('resgiterCustomerResults').innerText = "ERROR: This SSN is already registered. Please try a different SSN"
+        document.getElementById('resgiterCustomerResults').innerText = "ERROR: This User Name is already registered. Please try a different User Name"
     }else if(!(validateName(thisCustomer.first_name) && validateName(thisCustomer.last_name))){
         document.getElementById('resgiterCustomerResults').innerText = "ERROR: Name cannot have spaces or numbers"
     }else if(!(validateNumber(thisCustomer.phone_num) && validateNumber(thisCustomer.phone_num))){
@@ -348,7 +348,7 @@ const buyTicketInfo = async(ev)=>{
                 allValidTickets.push(thisValidTicketInfo)  
             } 
             if(!isSsnValid) {
-                thisTicketInfo.querySelectorAll(`.error_ssn`)[0].innerText = "SSN is required. Please fill in a value"
+                thisTicketInfo.querySelectorAll(`.error_ssn`)[0].innerText = "User Name is required. Please fill in a value"
             }
             if(!isFlightIDValid) {
                 thisTicketInfo.querySelectorAll(`.error_flight_id`)[0].innerText = "Flight ID is required. Please fill in a value"
@@ -380,7 +380,7 @@ const buyTicketInfo = async(ev)=>{
         } 
 
         if (!ssnExist) {
-            document.getElementById(`buyTicketsResults${j}`).innerText = `Error: The SSN ${allValidTickets[j].ssn} does not exist. Please register it above before buying a ticket with it.\n`
+            document.getElementById(`buyTicketsResults${j}`).innerText = `Error: The User Name ${allValidTickets[j].ssn} does not exist. Please register it above before buying a ticket with it.\n`
         }
         if (!flightIdExists) {
             document.getElementById(`buyTicketsResults${j}`).innerText = `Error: The flightID ${allValidTickets[j].flightID} does not exist. Please choose a valid flight.\n`
@@ -421,12 +421,12 @@ const buyTicketInfo = async(ev)=>{
             for(let i = 0; i < allFullyValidedTickets.length; i++){
                 if(saveTickRes[i].flightid2 === '-1') {
                     document.getElementById(`buyTicketsResults${i}`).innerText = 
-                    `Successfully bought a ticket for the person with SSN: ${saveTickRes[i].ssn} on flight with flightID: ${saveTickRes[i].flightid}
+                    `Successfully bought a ticket for the person with User Name: ${saveTickRes[i].ssn} on flight with flightID: ${saveTickRes[i].flightid}
                     The ticket number is ${saveTickRes[i].ticketno} and the final price was $${saveTickRes[i].finalprice}.\n`
                 } 
                 else {
                     document.getElementById(`buyTicketsResults${i}`).innerText = 
-                    `Successfully bought a ticket for the person with SSN: ${saveTickRes[i].ssn} on flight with flightID: ${saveTickRes[i].flightid} and connecting flightID ${saveTickRes[i].flightid2}
+                    `Successfully bought a ticket for the person with User Name: ${saveTickRes[i].ssn} on flight with flightID: ${saveTickRes[i].flightid} and connecting flightID ${saveTickRes[i].flightid2}
                     The ticket number is ${saveTickRes[i].ticketno} and the final price was $${saveTickRes[i].finalprice}.\n`
                 } 
             }
@@ -453,9 +453,9 @@ const cancelTicket = async(ev) => {
     }
 
     if (validTicketDetails(thisTicket) === false) {
-        document.getElementById('checkCancelResults').innerText = "SSN and Ticket Number are required. \n Please try again."
+        document.getElementById('checkCancelResults').innerText = "User Name and Ticket Number are required. \n Please try again."
     } else if (await ticketExists(thisTicket) === false) {
-        document.getElementById('checkCancelResults').innerText = "A ticket with this Ticket Number and SSN does not exist. \n Please try again."
+        document.getElementById('checkCancelResults').innerText = "A ticket with this Ticket Number and User Name does not exist. \n Please try again."
     } else {
         let thisClassType = await getClassType(thisTicket)
         //console.log("this class type: " + thisClassType[0].class_type)
@@ -486,7 +486,7 @@ const checkTicketStatus = async(ev) => {
     }
     
     if (validTicketDetails(thisTicket) === false) {
-        document.getElementById('checkStatusResults').innerText = "SSN and Ticket Number are required. \n Please try again."
+        document.getElementById('checkStatusResults').innerText = "User Name and Ticket Number are required. \n Please try again."
     } else if (await ticketExists(thisTicket) === false) {
         document.getElementById('checkStatusResults').innerText = "A ticket with this Ticket Number and SSN does not exist. \n Please try again."
     } else {
@@ -631,7 +631,7 @@ const getWaitlistInfo = async(ev)=>{
                 allValidTickets.push(thisValidTicketInfo)  
             } 
             if(!isSsnValid) {
-                thisTicketInfo.querySelectorAll(`.error_ssn`)[0].innerText = "SSN is required. Please fill in a value"
+                thisTicketInfo.querySelectorAll(`.error_ssn`)[0].innerText = "User Name is required. Please fill in a value"
             }
             if(!isFlightIDValid) {
                 thisTicketInfo.querySelectorAll(`.error_flight_id`)[0].innerText = "Flight ID is required. Please fill in a value"
@@ -666,7 +666,7 @@ const getWaitlistInfo = async(ev)=>{
         } 
 
         if (!ssnExist) {
-            document.getElementById(`waitListResults${j}`).innerText = `Error: The SSN ${allValidTickets[j].ssn} does not exist. Please register it above before buying a ticket with it.\n`
+            document.getElementById(`waitListResults${j}`).innerText = `Error: The User Name ${allValidTickets[j].ssn} does not exist. Please register it above before buying a ticket with it.\n`
         }
         if (!flightIdExists) {
             document.getElementById(`waitListResults${j}`).innerText = `Error: The flightID ${allValidTickets[j].flightID} does not exist. Please choose a valid flight.\n`
@@ -699,12 +699,12 @@ const getWaitlistInfo = async(ev)=>{
             for(let i = 0; i < allFullyValidedTickets.length; i++){
                 if(saveWaitListRes[i].flightid2 === '-1') {
                     document.getElementById(`waitListResults${i}`).innerText = 
-                    `Successfully added the person with SSN: ${saveWaitListRes[i].ssn} to the waitlist for flight with flightID: ${saveWaitListRes[i].flightid}
+                    `Successfully added the person with User Name: ${saveWaitListRes[i].ssn} to the waitlist for flight with flightID: ${saveWaitListRes[i].flightid}
                     Your waitlist number ID ${saveWaitListRes[i].waitlist_id} and your position on the waitlist is ${waitListPositionRes}.\n`
                 } 
                 else {
                     document.getElementById(`waitListResults${i}`).innerText = 
-                    `Successfully the person with SSN: ${saveWaitListRes[i].ssn} to the waitlist for flight with flightID: ${saveWaitListRes[i].flightid} and connecting flightID ${saveWaitListRes[i].flightid2}
+                    `Successfully the person with User Name: ${saveWaitListRes[i].ssn} to the waitlist for flight with flightID: ${saveWaitListRes[i].flightid} and connecting flightID ${saveWaitListRes[i].flightid2}
                     Your waitlist number ID ${saveWaitListRes[i].waitlist_id} and your position on the waitlist is ${waitListPositionRes}.\n`
                 } 
             }

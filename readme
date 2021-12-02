@@ -61,3 +61,30 @@ query.sql and transaction.sql files write all queries that are sent to the
 database. If the files are deleted they are created again by the program when
 the next query is written.
 
+WHAT EACH TEAM MEMBER DID:
+Paul Edson:
+-Initial database set up
+-Worked on initial and final ER diagram
+-Initial program structure, needed packages etc
+-implimenting connected flights
+-html tables
+-check status of tickets, implimenting front end and extending back end
+-Worked on PDF
+-Demo video
+-general error checking
+-worked on front end logic to register user
+
+William Berquist
+-worked on initial and final ER design
+-schema implimentation
+-Transaction to Buy tickets
+-Front end logic to buy tickets
+-Transaction to register User
+-worked on front end logic to register user
+-Transaction and front end logic to cancel ticket table
+-Transaction and front end logic for updating waitlist table
+-Query for finding single flights
+-initial ticket info query
+-waitlist position query
+-PDF
+-DEMO

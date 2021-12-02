@@ -10,6 +10,28 @@ run the following commands in the console
 -npm install cors
 -npm install express
 
+Run "node index.js" before launching index.html (This starts the server)
+
+PLEASE KEEP THE SAME FILE STRUCTURE THAT WE HAVE GIVEN YOU. We know that it is counter intuitive to have some files in a 
+test folder, and only some in a frontend folder. We would have changed this if we had time, but with only 2 members we just  
+ran out of time. This structure is strange, but the project works.                   
+
+exampleSQL.sql is a file with some of our queries that you can run. However, in our project our queries are embedded in javasc$
+This means that many of these queries will only work 1 time if running them seperately from the javascript.
+If you would like to really see our queries in action, please run them from our website. This is
+how they were meant to be used.  Otherwise run the sql file
+"Fully_reset_database.sql" which can be found in a directory above this one. This will remove the data entered from the
+exampleSQL.sql, and then allow you rerun the exampleSQL.sql file.
+
+ALSO NOTE: For searching flights and connected flights, the following cities are in are database by default:
+-New York
+-Los Angeles
+-Houston
+-Austin
+-Dallas
+-Denver
+You can use these to see our code in action.
+
 sources used
 TA example program
 https://github.com/tian1001tx/cosc3380
